@@ -17,6 +17,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.98.0/lib/index.iife.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
 <style>
 :root{
   color-scheme:dark;
@@ -131,6 +132,17 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px;line-hei
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
+.chart-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px}
+.tf{display:flex;gap:3px;background:var(--field);border:1px solid var(--border);border-radius:10px;padding:3px}
+.tf button{background:none;border:0;color:var(--sub);font-weight:800;font-size:12px;padding:6px 9px;border-radius:7px;cursor:pointer}
+.tf button.on{background:#2a2a2a;color:var(--text)}
+.chart{position:relative}
+.chart-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--sub);font-size:13px;text-align:center;padding:20px}
+.livebadge{font-size:11px;font-weight:800;color:var(--up);display:inline-flex;align-items:center;gap:5px;vertical-align:4px;margin-left:4px}
+.livebadge i{width:7px;height:7px;border-radius:50%;background:var(--up);animation:pulse 1.2s infinite}
+.flash-up{animation:fu 1s ease-out}.flash-down{animation:fd 1s ease-out}
+@keyframes fu{0%{color:var(--up);text-shadow:0 0 14px rgba(34,197,94,.7)}}
+@keyframes fd{0%{color:var(--down);text-shadow:0 0 14px rgba(240,68,68,.7)}}
 .app-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1d1707,#131313);border:1px solid var(--gold-line);border-radius:15px;padding:12px;margin-bottom:12px}
 .app-card img{width:44px;height:44px;border-radius:11px;flex-shrink:0}
 .app-card .t{font-weight:800;font-size:14px}.app-card .s{font-size:12px;color:var(--sub);margin-top:2px}
@@ -589,7 +601,7 @@ function recordTrade(mint, p, before, after){
 }
 
 // ================= Market feeds =================
-let feed = ls("feed","hot"), pairCache = {}, rowsShown = [], searching = false;
+let feed = ls("feed","hot"), pairCache = {}, gtPoolMap = {}, rowsShown = [], searching = false;
 function bestPairs(pairs){
   const by = {};
   for(const p of pairs || []){
@@ -624,6 +636,7 @@ function gtRows(j){
       pairCreatedAt: a.pool_created_at ? Date.parse(a.pool_created_at) : null,
       info:{imageUrl: t.image_url && !/missing/.test(t.image_url) ? t.image_url : null} };
     if(!pairCache[mint]) pairCache[mint] = row;
+    gtPoolMap[mint] = a.address;
     rows.push(row);
   }
   return rows;
@@ -674,7 +687,7 @@ function coinRow(p){
     <div class="av-wrap">${img ? `<img class="av" src="${esc(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<div class="av">${esc(sym[0])}</div>`}<span class="rdot ${r?r.level:""}"></span></div>
     <div class="grow"><div class="nm">${esc(p.baseToken.name)}<span>${esc(sym)}</span></div>
       <div class="meta">${tag}${usd(p.marketCap ?? p.fdv)}${p.pairCreatedAt?" · "+ago(p.pairCreatedAt):""}</div></div>
-    <div class="px"><b>${priceFmt(p.priceUsd)}</b>${pct(p.priceChange?.h24)}</div>
+    <div class="px" data-px="${esc(mint)}"><b>${priceFmt(p.priceUsd)}</b>${pct(p.priceChange?.h24)}</div>
     ${isPumpRow(p) ? `<button class="qb" onclick="event.stopPropagation();quickBuy('${esc(mint)}', this)">⚡ ${cfg.quick}</button>` : ""}</div>`;
 }
 function renderRows(rows){
@@ -783,10 +796,12 @@ async function safetyReport(v, mint){
 // ================= Token sheet =================
 let cur = null, side = "buy", holding = null;
 function openSheetHTML(h){ $("sheet").innerHTML = `<div class="grab"></div><button class="x" onclick="closeSheet()">×</button>` + h; $("sheetBg").classList.add("open"); }
-function closeSheet(){ $("sheetBg").classList.remove("open"); cur = null; }
+function closeSheet(){ $("sheetBg").classList.remove("open"); cur = null; stopLive(); destroyChart(); }
+function sheetOpen(){ return $("sheetBg").classList.contains("open"); }
 async function holdingOf(mint){ if(!wallet) return null; const t = await tokenAccounts(); return t.find(x => x.mint === mint) || null; }
 
 async function openToken(mint){
+  stopLive(); destroyChart(); lastShownPrice = null;
   cur = {mint, pair: pairCache[mint] || null, state:"loading"}; side = "buy"; holding = null;
   openSheetHTML(`<div class="empty">Loading…</div>`);
   if(!cur.pair){ try{ const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`)); if(cur?.mint === mint) cur.pair = by[mint] || null; }catch{} }
@@ -801,6 +816,7 @@ async function loadVenueFor(mint){
     const v = await loadVenue(mint);
     if(cur?.mint !== mint) return;
     cur.venue = v; cur.state = "ok";
+    if(tradable(v)){ startLive(mint); livePriceUpdate(); }
   }catch{ if(cur?.mint !== mint) return; cur.state = "rpcfail"; }
   renderTrade();
   const rep = await safetyReport(cur?.venue, mint);
@@ -814,9 +830,13 @@ function renderToken(){
     <div class="tk-head">${img?`<img class="av" src="${esc(img)}" alt="">`:`<div class="av">${esc(sym[0])}</div>`}
       <div class="grow"><h2>${esc(name)} <span style="color:var(--sub);font-size:14px;font-weight:600">${esc(sym)}</span></h2>
       <div class="meta" style="cursor:pointer" onclick="navigator.clipboard?.writeText('${esc(mint)}').then(()=>toast('Mint address copied'))">${short(mint)} ⧉</div></div></div>
-    <div class="tk-price" id="tkPrice">${priceFmt(p?.priceUsd)} ${pct(p?.priceChange?.h24)}</div>
+    <div class="tk-price"><span id="tkPriceVal">${priceFmt(p?.priceUsd)}</span> <span id="tkChg">${pct(p?.priceChange?.h24)}</span><span class="livebadge" id="liveBadge"></span></div>
     <div class="grid" id="tkStats">${statsHTML(p)}</div>
-    <div class="chart"><iframe src="https://dexscreener.com/solana/${esc(mint)}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=5" loading="lazy" title="Price chart"></iframe></div>
+    <div class="chart-bar">
+      <div class="tf" id="tfBar">${Object.keys(TF).map(t=>`<button data-tf="${t}" class="${t===chartTf?"on":""}" onclick="setTf('${t}')">${t}</button>`).join("")}</div>
+      <div class="tf"><button data-src="bulled" class="${chartSrc==="bulled"?"on":""}" onclick="setChartSrc('bulled')">Live</button><button data-src="dex" class="${chartSrc==="dex"?"on":""}" onclick="setChartSrc('dex')">DexScreener</button></div>
+    </div>
+    <div class="chart" id="chartBox"><div class="chart-msg">Loading chart…</div></div>
     <div class="panel" id="safety"><div class="panel-head"><span>🛡 Bulled Safety</span><span class="pill wait">Checking…</span></div></div>
     <div class="side"><div class="b on" onclick="setSide('buy')">Buy</div><div class="s" onclick="setSide('sell')">Sell</div></div>
     <div id="tradeBox"></div>
@@ -826,11 +846,12 @@ function renderToken(){
       <a href="https://solscan.io/token/${esc(mint)}" target="_blank" rel="noopener">Solscan ↗</a>
       <a href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">pump.fun ↗</a>
     </div>
-    <p class="fine">Trades are real, on-chain and final. Meme coins can go to zero. Only trade what you can afford to lose. Not financial advice.</p>`;
+    <p class="fine">Trades are real, on-chain and final. Meme coins can go to zero. Only trade what you can afford to lose. Not financial advice. Charts by <a href="https://www.tradingview.com" target="_blank" rel="noopener">TradingView</a>.</p>`;
   renderTrade();
+  loadChart();
 }
 function statsHTML(p){
-  return `<div class="st"><div class="l">Market cap</div><div class="v">${usd(p?.marketCap ?? p?.fdv)}</div></div>
+  return `<div class="st"><div class="l">Market cap</div><div class="v" id="tkMcap">${usd(p?.marketCap ?? p?.fdv)}</div></div>
     <div class="st"><div class="l">Liquidity</div><div class="v">${usd(p?.liquidity?.usd)}</div></div>
     <div class="st"><div class="l">24h volume</div><div class="v">${usd(p?.volume?.h24)}</div></div>
     <div class="st"><div class="l">5m</div><div class="v">${pct(p?.priceChange?.m5)}</div></div>
@@ -851,36 +872,48 @@ function setSide(s){
   document.querySelector(".side .s")?.classList.toggle("on", s==="sell");
   renderTrade();
 }
+function tradeParts(){
+  const v = cur.venue, sym = cur.pair?.baseToken?.symbol || "token", has = holding && holding.raw > 0n;
+  return {
+    warn: cur.safety?.level === "bad" ? `<div class="note warn" style="margin-top:12px">⚠️ Bulled Safety flags this coin as high risk. You could lose everything you put in.</div>` : "",
+    where: v.kind === "curve"
+      ? `<div class="quote"><div><span>🟡 On the pump.fun curve</span><b id="curveProgTxt">${curveProgress(v).toFixed(1)}% to graduation</b></div><div class="progress" style="padding:0"><div id="curveProgBar" style="width:${curveProgress(v)}%;padding:0"></div></div></div>`
+      : `<div class="quote"><div><span>🎓 Graduated · trading on PumpSwap</span><b>live pool</b></div></div>`,
+    label: side === "buy" ? `Amount (SOL)${solBal!=null?` · balance ${solBal.toFixed(4)}`:""}` : `Amount (${esc(sym)})${has?` · you hold ${fmtTok(holding.raw, holding.decimals)}`:""}`,
+    presets: side === "buy" ? [0.05,0.1,0.25,0.5,1].map(x=>`<button onclick="setAmt(${x})">${x}</button>`).join("")
+      : [25,50,75,100].map(x=>`<button onclick="setPct(${x})" ${has?"":"disabled"}>${x}%</button>`).join(""),
+    placeholder: side === "buy" ? "0.1" : (has ? "0" : "You don't hold this coin"),
+    button: wallet ? `${side==="buy"?"Buy":"Sell"} ${esc(sym)}` : `Connect Phantom to ${side}`,
+  };
+}
+// Draws the buy/sell box. If the same form is already showing, only the changing parts are updated,
+// so a live refresh never interrupts someone typing an amount.
 function renderTrade(){
   const box = $("tradeBox"); if(!box || !cur) return;
-  const prevEl = $("amt"), prev = prevEl && prevEl.value ? {v: prevEl.value, raw: prevEl.dataset.raw, side: box.dataset.side, result: $("quoteBox")?.querySelector(".note") ? $("quoteBox").innerHTML : null} : null;
-  box.dataset.side = side;
-  const v = cur.venue, sym = cur.pair?.baseToken?.symbol || "token";
-  if(cur.state === "loading"){ box.innerHTML = `<div class="quote"><div><span>Finding the best way to trade…</span></div></div>`; return; }
-  if(cur.state === "rpcfail"){ box.innerHTML = `<div class="note warn" style="margin-top:12px">Couldn't reach Solana. Check your connection and try again.</div>`; return; }
+  const v = cur.venue;
+  if(cur.state === "loading"){ box.dataset.key = "loading"; box.innerHTML = `<div class="quote"><div><span>Finding the best way to trade…</span></div></div>`; return; }
+  if(cur.state === "rpcfail"){ box.dataset.key = "fail"; box.innerHTML = `<div class="note warn" style="margin-top:12px">Couldn't reach Solana. Check your connection and try again.</div>`; return; }
   if(!tradable(v)){
+    box.dataset.key = "untradable";
     const why = v?.reason === "usdc" ? "This coin trades against USDC, which Bulled doesn't support yet." : "Bulled trades pump.fun coins, and this one isn't from pump.fun.";
     box.innerHTML = `<div class="note" style="margin-top:12px">${why} You can still trade it in your Phantom wallet's Swap tab.</div>`;
     return;
   }
-  const warn = cur.safety?.level === "bad" ? `<div class="note warn" style="margin-top:12px">⚠️ Bulled Safety flags this coin as high risk. You could lose everything you put in.</div>` : "";
-  const where = v.kind === "curve"
-    ? `<div class="quote"><div><span>🟡 On the pump.fun curve</span><b>${curveProgress(v).toFixed(1)}% to graduation</b></div><div class="progress" style="padding:0"><div style="width:${curveProgress(v)}%;padding:0"></div></div></div>`
-    : `<div class="quote"><div><span>🎓 Graduated · trading on PumpSwap</span><b>live pool</b></div></div>`;
-  const has = holding && holding.raw > 0n;
-  box.innerHTML = side === "buy"
-    ? `${warn}${where}<label>Amount (SOL)${solBal!=null?` · balance ${solBal.toFixed(4)}`:""}</label>
-      <input id="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.1">
-      <div class="presets">${[0.05,0.1,0.25,0.5,1].map(x=>`<button onclick="setAmt(${x})">${x}</button>`).join("")}</div>
-      <div id="quoteBox"></div>
-      <button class="btn full buy" id="goBtn" style="margin-top:12px" onclick="doTrade()">${wallet?`Buy ${esc(sym)}`:"Connect Phantom to buy"}</button>`
-    : `${warn}${where}<label>Amount (${esc(sym)})${has?` · you hold ${fmtTok(holding.raw, holding.decimals)}`:""}</label>
-      <input id="amt" type="number" inputmode="decimal" min="0" placeholder="${has?"0":"You don't hold this coin"}">
-      <div class="presets">${[25,50,75,100].map(x=>`<button onclick="setPct(${x})" ${has?"":"disabled"}>${x}%</button>`).join("")}</div>
-      <div id="quoteBox"></div>
-      <button class="btn full sell" id="goBtn" style="margin-top:12px" onclick="doTrade()">${wallet?`Sell ${esc(sym)}`:"Connect Phantom to sell"}</button>`;
+  const t = tradeParts(), key = `${v.kind}|${side}`;
+  if(box.dataset.key === key && $("amt")){
+    $("tradeWarn").innerHTML = t.warn; $("tradeWhere").innerHTML = t.where; $("amtLabel").innerHTML = t.label;
+    $("presetRow").innerHTML = t.presets; $("amt").placeholder = t.placeholder;
+    const btn = $("goBtn"); if(btn && !btn.disabled) btn.innerHTML = t.button;
+    return;
+  }
+  box.dataset.key = key;
+  box.innerHTML = `<div id="tradeWarn">${t.warn}</div><div id="tradeWhere">${t.where}</div>
+    <label id="amtLabel">${t.label}</label>
+    <input id="amt" type="number" inputmode="decimal" min="0" ${side==="buy"?'step="0.01"':""} placeholder="${t.placeholder}">
+    <div class="presets" id="presetRow">${t.presets}</div>
+    <div id="quoteBox"></div>
+    <button class="btn full ${side}" id="goBtn" style="margin-top:12px" onclick="doTrade()">${t.button}</button>`;
   $("amt").addEventListener("input", () => { delete $("amt").dataset.raw; clearTimeout(window._qt); window._qt = setTimeout(showQuote, 300); });
-  if(prev && prev.side === side){ $("amt").value = prev.v; if(prev.raw) $("amt").dataset.raw = prev.raw; if(prev.result) $("quoteBox").innerHTML = prev.result; else showQuote(); }
 }
 function setAmt(x){ $("amt").value = x; showQuote(); }
 function setPct(x){
@@ -929,7 +962,7 @@ async function doTrade(){
     if(cur?.mint === mint){
       holding = await holdingOf(mint).catch(()=>holding);
       cur.venue = await loadVenue(mint).catch(()=>cur.venue);
-      renderTrade(); showResult(signature, ok);
+      renderTrade(); if($("amt")) $("amt").value = ""; showResult(signature, ok);
     } else toast(ok===false ? "Trade failed" : "Trade confirmed");
   }catch(e){ tradeError(e); }
   finally{ if(document.body.contains(btn)){ btn.disabled = false; btn.innerHTML = label; } }
@@ -1097,22 +1130,188 @@ async function loadSolPrice(){
     SOL_USD = Number(ps[0]?.priceUsd || SOL_USD);
   }catch{}
 }
-// Live: refresh the list every 20s and the open coin every 8s while the app is visible
-setInterval(() => { if(document.hidden) return; if(view==="market" && !searching && !$("sheetBg").classList.contains("open")) loadList(true); }, 20000);
+// ================= Live charts =================
+const TF = {"1m":["minute",1,60],"5m":["minute",5,300],"15m":["minute",15,900],"1h":["hour",1,3600]};
+let chartTf = ls("tf","1m"), chartSrc = ls("chartsrc","bulled"), chart = null, candleSeries = null, volSeries = null, lastBar = null, chartToken = 0;
+function dexIframe(mint){
+  const iv = {"1m":"1","5m":"5","15m":"15","1h":"60"}[chartTf];
+  return `<iframe src="https://dexscreener.com/solana/${esc(mint)}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=${iv}" title="Price chart"></iframe>`;
+}
+function destroyChart(){ try{ chart?.remove(); }catch{} chart = candleSeries = volSeries = lastBar = null; }
+function markChartButtons(){
+  document.querySelectorAll("#tfBar button").forEach(b => b.classList.toggle("on", b.dataset.tf === chartTf));
+  document.querySelectorAll(".chart-bar [data-src]").forEach(b => b.classList.toggle("on", b.dataset.src === chartSrc));
+}
+function setTf(t){ chartTf = t; lsSet("tf", t); markChartButtons(); loadChart(); }
+function setChartSrc(s){ chartSrc = s; lsSet("chartsrc", s); markChartButtons(); loadChart(); }
+async function gtPoolFor(mint){
+  if(gtPoolMap[mint]) return gtPoolMap[mint];
+  const j = await gt(`/tokens/${mint}/pools?page=1`);
+  const pool = (j.data || []).find(p => /pump/i.test(p.relationships?.dex?.data?.id || "")) || j.data?.[0];
+  return (gtPoolMap[mint] = pool?.attributes?.address || null);
+}
+async function loadChart(){
+  const box = $("chartBox"); if(!box || !cur) return;
+  const mint = cur.mint, token = ++chartToken;
+  destroyChart();
+  if(chartSrc === "dex" || !window.LightweightCharts){ box.innerHTML = dexIframe(mint); return; }
+  box.innerHTML = `<div class="chart-msg">Loading chart…</div>`;
+  try{
+    const pool = await gtPoolFor(mint); if(!pool) throw new Error("nopool");
+    const [tf, agg] = TF[chartTf];
+    const j = await gt(`/pools/${pool}/ohlcv/${tf}?aggregate=${agg}&limit=300&currency=usd&token=${mint}`);
+    if(token !== chartToken || cur?.mint !== mint) return;
+    const list = (j.data?.attributes?.ohlcv_list || []).slice().sort((x,y) => x[0]-y[0]);
+    if(!list.length) throw new Error("empty");
+    box.innerHTML = "";
+    chart = LightweightCharts.createChart(box, {
+      autoSize: true,
+      layout: { background: {type:"solid", color:"#131313"}, textColor:"#8e8e8e", fontFamily:"Inter, sans-serif" },
+      grid: { vertLines:{color:"#1c1c1c"}, horzLines:{color:"#1c1c1c"} },
+      rightPriceScale: { borderColor:"#222" },
+      timeScale: { borderColor:"#222", timeVisible:true, secondsVisible:false, rightOffset:4 },
+      crosshair: { mode: 0 },
+      localization: { priceFormatter: x => priceFmt(x).replace("$","") },
+    });
+    candleSeries = chart.addCandlestickSeries({ upColor:"#22c55e", downColor:"#f04444", borderVisible:false, wickUpColor:"#22c55e", wickDownColor:"#f04444",
+      priceFormat:{ type:"custom", minMove:1e-12, formatter: x => priceFmt(x).replace("$","") } });
+    volSeries = chart.addHistogramSeries({ priceFormat:{type:"volume"}, priceScaleId:"" });
+    volSeries.priceScale().applyOptions({ scaleMargins:{ top:0.82, bottom:0 } });
+    const bars = list.map(r => ({ time:r[0], open:+r[1], high:+r[2], low:+r[3], close:+r[4] }));
+    candleSeries.setData(bars);
+    volSeries.setData(list.map(r => ({ time:r[0], value:+r[5], color: +r[4] >= +r[1] ? "rgba(34,197,94,.35)" : "rgba(240,68,68,.35)" })));
+    lastBar = {...bars[bars.length-1]};
+    chart.timeScale().fitContent();
+    if(lastShownPrice) chartTick(lastShownPrice);
+  }catch{
+    if(token !== chartToken || cur?.mint !== mint) return;
+    box.innerHTML = dexIframe(mint);          // no candle history yet (brand-new coin) → DexScreener's chart
+  }
+}
+// Moves the current candle with every live price, and starts a new candle when the time bucket rolls over
+function chartTick(price){
+  if(!candleSeries || !lastBar || !(price > 0)) return;
+  const sec = TF[chartTf][2], t = Math.floor(Date.now()/1000/sec) * sec;
+  lastBar = t > lastBar.time
+    ? { time:t, open:lastBar.close, high:Math.max(lastBar.close, price), low:Math.min(lastBar.close, price), close:price }
+    : { ...lastBar, high:Math.max(lastBar.high, price), low:Math.min(lastBar.low, price), close:price };
+  try{ candleSeries.update(lastBar); }catch{}
+}
+
+// ================= Live prices straight from Solana =================
+// Watches the coin's pump.fun curve or pool over a websocket, so the price moves the instant anyone trades.
+let ws = null, wsSubs = {}, wsPending = {}, wsReq = 0, wsRetry = 0, liveMint = null, pollTimer = null, lastWsTick = 0, lastShownPrice = null;
+function wsUrl(){ return cfg.rpc.replace(/^http/, "ws"); }
+function wsConnect(){
+  if(ws && ws.readyState <= 1) return;
+  try{ ws = new WebSocket(wsUrl()); }catch{ ws = null; return; }
+  ws.onopen = () => { wsRetry = 0; if(liveMint && cur?.mint === liveMint) subscribeVenue(); };
+  ws.onmessage = e => {
+    let m; try{ m = JSON.parse(e.data); }catch{ return; }
+    if(m.id != null && wsPending[m.id]){ wsPending[m.id](m.result); delete wsPending[m.id]; return; }
+    if(m.method === "accountNotification"){ const h = wsSubs[m.params?.subscription]; if(h) h(m.params.result.value); }
+  };
+  ws.onclose = () => { wsSubs = {}; wsPending = {}; if(liveMint) setTimeout(wsConnect, Math.min(15000, 1000 * 2 ** wsRetry++)); };
+  ws.onerror = () => {};
+}
+function wsSend(method, params){ return new Promise(res => { const id = ++wsReq; wsPending[id] = res; try{ ws.send(JSON.stringify({jsonrpc:"2.0", id, method, params})); }catch{ delete wsPending[id]; res(null); } }); }
+async function wsSubscribe(addr, handler){ const id = await wsSend("accountSubscribe", [addr, {encoding:"base64", commitment:"processed"}]); if(id != null) wsSubs[id] = handler; }
+function wsUnsubscribeAll(){
+  if(ws && ws.readyState === 1) for(const id of Object.keys(wsSubs)){ try{ ws.send(JSON.stringify({jsonrpc:"2.0", id:++wsReq, method:"accountUnsubscribe", params:[Number(id)]})); }catch{} }
+  wsSubs = {};
+}
+function subscribeVenue(){
+  wsUnsubscribeAll();
+  const v = cur?.venue; if(!tradable(v) || !ws || ws.readyState !== 1) return;
+  if(v.kind === "curve") wsSubscribe(v.address.toBase58(), val => onCurveData(b64bytes(val.data[0])));
+  else { wsSubscribe(v.baseAcct.toBase58(), val => onPoolData("base", b64bytes(val.data[0]))); wsSubscribe(v.quoteAcct.toBase58(), val => onPoolData("quote", b64bytes(val.data[0]))); }
+}
+function startLive(mint){
+  liveMint = mint; clearInterval(pollTimer);
+  // Backup: if the live stream is quiet or blocked, re-read the chain every 3 seconds
+  pollTimer = setInterval(async () => {
+    if(document.hidden || cur?.mint !== mint || Date.now() - lastWsTick < 6000) return;
+    const v = await loadVenue(mint).catch(() => null);
+    if(v && cur?.mint === mint && tradable(v)){ const kindChanged = cur.venue?.kind !== v.kind; cur.venue = v; if(kindChanged){ renderTrade(); subscribeVenue(); } livePriceUpdate(); }
+  }, 3000);
+  if(!ws || ws.readyState > 1) wsConnect(); else if(ws.readyState === 1) subscribeVenue();
+}
+function stopLive(){ liveMint = null; clearInterval(pollTimer); wsUnsubscribeAll(); }
+function onCurveData(d){
+  const v = cur?.venue; if(!v || v.kind !== "curve" || d.length < 81) return;
+  lastWsTick = Date.now();
+  v.vT = readU64(d,8); v.vS = readU64(d,16); v.rT = readU64(d,24); v.rS = readU64(d,32);
+  if(d[48] === 1){
+    toast("🎓 This coin just graduated! Switching to its PumpSwap pool…", 3500);
+    const mint = cur.mint;
+    (async () => {
+      for(let i = 0; i < 8 && cur?.mint === mint; i++){          // the pool can take a few seconds to confirm
+        const nv = await loadVenue(mint).catch(() => null);
+        if(nv && nv.kind === "amm" && cur?.mint === mint){ cur.venue = nv; renderTrade(); subscribeVenue(); livePriceUpdate(); return; }
+        await sleep(2000);
+      }
+    })();
+    return;
+  }
+  livePriceUpdate();
+}
+function onPoolData(which, d){
+  const v = cur?.venue; if(!v || v.kind !== "amm" || d.length < 72) return;
+  lastWsTick = Date.now();
+  if(which === "base") v.baseRes = readU64(d,64); else v.quoteRes = readU64(d,64);
+  livePriceUpdate();
+}
+function venuePriceSol(v){
+  return v.kind === "curve" ? (Number(v.vS)/1e9) / (Number(v.vT)/10**v.decimals) : (Number(v.quoteRes)/1e9) / (Number(v.baseRes)/10**v.decimals);
+}
+function livePriceUpdate(){
+  const v = cur?.venue; if(!tradable(v) || !SOL_USD) return;
+  const p = venuePriceSol(v) * SOL_USD; if(!isFinite(p) || p <= 0) return;
+  const el = $("tkPriceVal");
+  if(el){
+    if(lastShownPrice != null && p !== lastShownPrice){ el.classList.remove("flash-up","flash-down"); void el.offsetWidth; el.classList.add(p > lastShownPrice ? "flash-up" : "flash-down"); }
+    el.textContent = priceFmt(p);
+  }
+  lastShownPrice = p;
+  const mc = $("tkMcap"); if(mc && v.mintInfo) mc.textContent = usd(p * Number(v.mintInfo.supply) / 10**v.decimals);
+  const lb = $("liveBadge"); if(lb && !lb.innerHTML) lb.innerHTML = "<i></i>LIVE";
+  if(v.kind === "curve"){ const t = $("curveProgTxt"), b = $("curveProgBar"), pr = curveProgress(v); if(t) t.textContent = pr.toFixed(1) + "% to graduation"; if(b) b.style.width = pr + "%"; }
+  const amt = $("amt"), qb = $("quoteBox");
+  if(amt?.value && qb && !qb.querySelector(".note")) showQuote();
+  chartTick(p);
+}
+
+// ================= Live market list =================
+async function refreshListPrices(){
+  if(!rowsShown.length) return;
+  const mints = rowsShown.map(r => r.baseToken.address).slice(0, 60);
+  const by = await pairsFor(mints);
+  for(const r of rowsShown){
+    const n = by[r.baseToken.address]; if(!n) continue;
+    const oldP = Number(r.priceUsd), newP = Number(n.priceUsd);
+    r.priceUsd = n.priceUsd; r.priceChange = n.priceChange; r.marketCap = n.marketCap ?? r.marketCap; r.volume = n.volume;
+    document.querySelectorAll(`[data-px="${r.baseToken.address}"]`).forEach(el => {
+      el.innerHTML = `<b>${priceFmt(newP)}</b>${pct(n.priceChange?.h24)}`;
+      if(oldP && newP && oldP !== newP) el.querySelector("b").classList.add(newP > oldP ? "flash-up" : "flash-down");
+    });
+  }
+}
+setInterval(() => { if(!document.hidden && view === "market" && !searching && !sheetOpen()) refreshListPrices().catch(()=>{}); }, 10000);
+setInterval(() => { if(!document.hidden && view === "market" && !searching && !sheetOpen()) loadList(true); }, 60000);
+// Open coin: refresh 24h change, volume and liquidity every 10s (the price itself is live from the chain)
 setInterval(async () => {
-  if(document.hidden || !cur?.mint || !$("sheetBg").classList.contains("open")) return;
+  if(document.hidden || !cur?.mint || !sheetOpen()) return;
   const mint = cur.mint;
   try{
     const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`));
     if(cur?.mint !== mint || !by[mint]) return;
     cur.pair = by[mint];
-    const tp = $("tkPrice"), ts = $("tkStats");
-    if(tp) tp.innerHTML = `${priceFmt(cur.pair.priceUsd)} ${pct(cur.pair.priceChange?.h24)}`;
-    if(ts) ts.innerHTML = statsHTML(cur.pair);
-    const v = await loadVenue(mint).catch(()=>null);
-    if(v && cur?.mint === mint){ cur.venue = v; if($("amt")?.value) showQuote(); }
+    const chg = $("tkChg"), ts = $("tkStats");
+    if(chg) chg.innerHTML = pct(cur.pair.priceChange?.h24);
+    if(ts){ ts.innerHTML = statsHTML(cur.pair); if(lastShownPrice) livePriceUpdate(); }
+    if(!tradable(cur.venue)){ const el = $("tkPriceVal"); if(el) el.textContent = priceFmt(cur.pair.priceUsd); }
   }catch{}
-}, 8000);
+}, 10000);
 setInterval(loadSolPrice, 60000);
 
 // ================= Boot =================
