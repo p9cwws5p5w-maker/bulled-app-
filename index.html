@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bulled</title>
 <meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Trade pump.fun coins with rug warnings built in.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bulled">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -94,6 +102,15 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
+.app-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1d1707,#121212);border:1px solid var(--gold-line);border-radius:14px;padding:12px;margin-bottom:12px}
+.app-card img{width:44px;height:44px;border-radius:11px;flex-shrink:0}
+.app-card .t{font-weight:800;font-size:14px}.app-card .s{font-size:12px;color:var(--sub);margin-top:2px}
+.app-card .btn{padding:8px 12px;font-size:13px}
+.app-card .dismiss{background:none;border:0;color:var(--faint);font-size:20px;cursor:pointer;padding:0 2px}
+.inst-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);font-size:14.5px;line-height:1.45}
+.inst-step .n{width:28px;height:28px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.inst-step .ico{display:inline-flex;align-items:center;justify-content:center;background:var(--field);border:1px solid var(--border-2);border-radius:7px;padding:1px 7px;font-weight:700;margin:0 2px}
+.ok-badge{display:inline-block;background:var(--up-bg);color:var(--up);font-weight:800;border-radius:999px;padding:4px 10px;font-size:12px}
 </style>
 </head>
 <body>
@@ -104,6 +121,7 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
 
 <main>
   <div id="view-market">
+    <div id="appCard"></div>
     <div class="search">
       <input id="q" placeholder="Search coin or paste mint address" autocomplete="off" autocapitalize="off" spellcheck="false">
     </div>
@@ -120,7 +138,12 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
   </div>
 
   <div id="view-settings" class="hide">
-    <h2 style="margin:6px 0 4px">Settings</h2>
+    <h2 style="margin:6px 0 10px">Settings</h2>
+    <div class="app-card" style="margin-bottom:14px">
+      <img src="icons/icon-180.png" alt="">
+      <div class="grow"><div class="t">Bulled app</div><div class="s" id="appStatus">Put Bulled on your home screen</div></div>
+      <button class="btn" id="appBtn" onclick="openInstall()">Get the app</button>
+    </div>
     <div class="note">Bulled never asks for your seed phrase or private key. Every trade is approved in your Phantom wallet.</div>
     <label>Custom Solana RPC URL (optional — Bulled has one built in)</label>
     <input id="set-rpc" placeholder="Using Bulled's built-in RPC" autocomplete="off" spellcheck="false">
@@ -750,9 +773,68 @@ function saveSettings(){
   toast("Settings saved"); refreshBalance();
 }
 
+// ---------- app install ----------
+let installPrompt = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; renderAppCard(); });
+window.addEventListener("appinstalled", () => { installPrompt = null; lsSet("installed","1"); renderAppCard(); toast("Bulled installed 🎉"); });
+function isStandalone(){ return window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true; }
+function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
+function isAndroid(){ return /android/i.test(navigator.userAgent); }
+function inWalletBrowser(){ return isMobile() && !!provider(); }   // Phantom's in-app browser can't install apps
+function siteLink(){ return location.origin + location.pathname.replace(/index\.html$/, ""); }
+function renderAppCard(){
+  const st = $("appStatus"), btn = $("appBtn");
+  if(st && btn){
+    if(isStandalone()){ st.innerHTML = `<span class="ok-badge">✓ Installed</span> You're using the app`; btn.classList.add("hide"); }
+    else { st.textContent = "Put Bulled on your home screen · free, no App Store"; btn.classList.remove("hide"); }
+  }
+  const card = $("appCard"); if(!card) return;
+  if(isStandalone() || ls("appcard","") === "hidden"){ card.innerHTML = ""; return; }
+  card.innerHTML = `<div class="app-card"><img src="icons/icon-180.png" alt="">
+    <div class="grow"><div class="t">Get the Bulled app</div><div class="s">Home-screen icon, full screen, 2 taps</div></div>
+    <button class="btn" onclick="openInstall()">Get it</button>
+    <button class="dismiss" aria-label="Hide" onclick="lsSet('appcard','hidden');renderAppCard()">×</button></div>`;
+}
+function step(n, html){ return `<div class="inst-step"><div class="n">${n}</div><div>${html}</div></div>`; }
+async function openInstall(){
+  const head = `<button class="x" onclick="closeSheet()">×</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><img src="icons/icon-180.png" alt="" style="width:56px;height:56px;border-radius:14px"><div><h2 style="margin:0">Get the Bulled app</h2><div class="meta">Free · installs in seconds · no App Store</div></div></div>`;
+  let body;
+  if(isStandalone()){
+    body = `<p style="font-size:14.5px;line-height:1.5">You're already using the Bulled app. 🎉</p>`;
+  } else if(installPrompt){
+    installPrompt.prompt();
+    const r = await installPrompt.userChoice.catch(()=>({}));
+    installPrompt = null; renderAppCard();
+    if(r.outcome === "accepted") return;
+    body = `<p style="font-size:14.5px;line-height:1.5">No problem. Tap <b>Get the app</b> in Settings any time.</p>`;
+  } else if(inWalletBrowser()){
+    body = `<p style="font-size:14px;color:var(--sub);line-height:1.5">You're inside the Phantom app, which can't add apps to your home screen. It takes 3 quick steps:</p>
+      ${step(1, `Copy the Bulled link<br><button class="btn ghost" style="margin-top:8px" onclick="copyLink()">Copy link</button>`)}
+      ${step(2, `Open <b>${isIOS() ? "Safari" : "Chrome"}</b> and paste the link`)}
+      ${step(3, `Tap <b>Get the app</b> on Bulled there and follow the steps`)}`;
+  } else if(isIOS()){
+    body = step(1, `Tap the <span class="ico">Share ⬆︎</span> button (bottom of Safari, or top-right in Chrome)`) +
+           step(2, `Scroll down and tap <span class="ico">Add to Home Screen ⊞</span>`) +
+           step(3, `Tap <b>Add</b>. Bulled is now on your home screen`);
+  } else if(isAndroid()){
+    body = step(1, `Tap the <span class="ico">⋮</span> menu in the top-right of Chrome`) +
+           step(2, `Tap <span class="ico">Install app</span> or <span class="ico">Add to Home screen</span>`) +
+           step(3, `Tap <b>Install</b>. Bulled is now on your home screen`);
+  } else {
+    body = step(1, `Look for the <span class="ico">install ⊕</span> icon at the right end of your browser's address bar`) +
+           step(2, `Click it, then click <b>Install</b>`) +
+           `<p class="fine">On your phone, open ${esc(siteLink())} and tap <b>Get the app</b>.</p>`;
+  }
+  openSheetHTML(head + body + `<div class="note" style="margin-top:14px">To trade from the app, tap <b>Connect Phantom</b>. Bulled opens in Phantom so you can approve trades with your wallet.</div>`);
+}
+function copyLink(){ navigator.clipboard?.writeText(siteLink()).then(()=>toast("Link copied. Now open " + (isIOS() ? "Safari" : "Chrome")), ()=>toast(siteLink(), 6000)); }
+
 // ---------- boot ----------
 renderWallet();
+renderAppCard();
 loadList();
+if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 setTimeout(async () => {
   const p = provider();
   if(p){
