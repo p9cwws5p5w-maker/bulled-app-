@@ -124,7 +124,7 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
     <div class="note">Bulled never asks for your seed phrase or private key. Every trade is approved in your Phantom wallet.</div>
     <label>Custom Solana RPC URL (optional — Bulled has one built in)</label>
     <input id="set-rpc" placeholder="Using Bulled's built-in RPC" autocomplete="off" spellcheck="false">
-    <label>Slippage</label>
+    <label>Price protection — trade cancels if the price jumps more than this before it goes through (you're never charged extra)</label>
     <select id="set-slip">
       <option value="50">0.5%</option><option value="100">1%</option><option value="300">3%</option>
       <option value="500">5%</option><option value="1000">10%</option><option value="2000">20%</option>
@@ -642,16 +642,14 @@ async function getQuote(){
   }
   qb.innerHTML = p.side === "buy" ? `<div class="quote">
       <div><span>You receive (est.)</span><b>${fmtTok(p.out,d)} ${esc(sym)}</b></div>
-      <div><span>Minimum after slippage</span><b>${fmtTok(p.minOut,d)} ${esc(sym)}</b></div>
       <div><span>Bulled fee (0.45%)</span><b>${fmtSol(p.fee)} SOL</b></div>
       <div><span>pump.fun fee (1.25%)</span><b>included</b></div>
-      <div><span>Slippage</span><b>${cfg.slip/100}%</b></div></div>`
+      </div>`
     : `<div class="quote">
       <div><span>You receive (est.)</span><b>${fmtSol(p.youGet)} SOL</b></div>
-      <div><span>Minimum after slippage</span><b>${fmtSol(p.minSol - p.fee)} SOL</b></div>
       <div><span>Bulled fee (0.45%)</span><b>${fmtSol(p.fee)} SOL</b></div>
       <div><span>pump.fun fee (1.25%)</span><b>included</b></div>
-      <div><span>Slippage</span><b>${cfg.slip/100}%</b></div></div>`;
+      </div>`;
   return p;
 }
 
@@ -680,7 +678,7 @@ async function doTrade(){
   }catch(e){
     const m = String(e?.message || e);
     if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in Phantom");
-    else toast(m.length > 110 ? "Trade failed. Try again or raise slippage." : m, 4000);
+    else toast(m.length > 110 ? "Trade didn't go through. Try again." : m, 4000);
   }finally{
     if(document.body.contains(btn)){ btn.disabled = false; btn.innerHTML = label; }
   }
@@ -699,7 +697,7 @@ async function waitConfirm(sig){
 }
 function showResult(sig, ok){
   const qb = $("quoteBox");
-  const txt = ok===true ? "✅ Trade confirmed" : ok===false ? "❌ Trade failed on-chain — only the network fee was spent. Try higher slippage." : "📤 Trade sent — check Solscan for confirmation";
+  const txt = ok===true ? "✅ Trade confirmed" : ok===false ? "❌ Price moved too fast, so the trade was cancelled and no coins or SOL were swapped (only a tiny network fee). Try again, or raise Price protection in Settings." : "📤 Trade sent — check Solscan for confirmation";
   if(qb) qb.innerHTML = `<div class="note ${ok===false?"warn":""}" style="margin-top:12px">${txt}<br><a href="https://solscan.io/tx/${esc(sig)}" target="_blank" rel="noopener">View transaction ↗</a></div>`;
   toast(ok===true ? "Trade confirmed" : ok===false ? "Trade failed" : "Trade sent");
 }
