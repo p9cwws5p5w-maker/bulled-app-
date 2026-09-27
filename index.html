@@ -627,9 +627,7 @@ async function rawAmount(){
   if(side === "buy") return BigInt(Math.floor(v * 1e9));
   if(el.dataset.raw) return BigInt(el.dataset.raw);
   const d = cur.curve?.decimals ?? 6;
-  let raw = BigInt(Math.floor(v * 10**d));
-  if(holding && raw > holding.raw) raw = holding.raw;
-  return raw;
+  return BigInt(Math.floor(v * 10**d));
 }
 const fmtSol = l => (Number(l)/1e9).toLocaleString(undefined,{maximumFractionDigits:5});
 const fmtTok = (t, d) => (Number(t)/10**d).toLocaleString(undefined,{maximumFractionDigits:2});
@@ -638,6 +636,10 @@ async function getQuote(){
   const p = await planTrade();
   if(!p){ qb.innerHTML = ""; return null; }
   const sym = cur.pair?.baseToken?.symbol || "", d = cur.curve.decimals;
+  if(p.side === "sell" && (!holding || p.tokens > holding.raw)){
+    qb.innerHTML = `<div class="note warn" style="margin-top:12px">You only hold ${holding ? fmtTok(holding.raw, holding.decimals) : "0"} ${esc(sym)}. Tap 100% to sell it all.</div>`;
+    return null;
+  }
   qb.innerHTML = p.side === "buy" ? `<div class="quote">
       <div><span>You receive (est.)</span><b>${fmtTok(p.out,d)} ${esc(sym)}</b></div>
       <div><span>Minimum after slippage</span><b>${fmtTok(p.minOut,d)} ${esc(sym)}</b></div>
@@ -671,9 +673,10 @@ async function doTrade(){
     const sig = await executePlan(p);
     btn.innerHTML = `<span class="spin"></span>Confirming…`;
     const ok = await waitConfirm(sig);
-    showResult(sig, ok);
-    refreshBalance(); loadHolding(cur.mint);
-    cur.curve = await loadCurve(cur.mint).catch(()=>cur.curve);
+    const mint = cur.mint;
+    await Promise.all([refreshBalance(), loadHolding(mint), loadCurve(mint).then(c => { if(cur && cur.mint === mint) cur.curve = c; }).catch(()=>{})]);
+    if(cur && cur.mint === mint){ renderTrade(); showResult(sig, ok); }
+    else toast(ok===false ? "Trade failed" : "Trade confirmed");
   }catch(e){
     const m = String(e?.message || e);
     if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in Phantom");
