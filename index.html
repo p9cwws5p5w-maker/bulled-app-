@@ -20,89 +20,118 @@
 <style>
 :root{
   color-scheme:dark;
-  --bg:#0a0a0a;--card:#121212;--card-2:#171717;--border:#222;--border-2:#2c2c2c;
-  --text:#f5f5f5;--sub:#8e8e8e;--faint:#5c5c5c;--field:#1a1a1a;
-  --gold:#f5b300;--gold-ink:#f5b300;--gold-bg:#1d1707;--gold-line:#3a300f;
-  --up:#22c55e;--down:#f04444;--up-bg:#0f2418;--down-bg:#2a1111;--warn:#facc15;
+  --bg:#0a0a0a;--card:#131313;--card-2:#181818;--border:#222;--border-2:#2d2d2d;
+  --text:#f5f5f5;--sub:#8e8e8e;--faint:#5c5c5c;--field:#1b1b1b;
+  --gold:#f5b300;--gold-bg:#1d1707;--gold-line:#3a300f;
+  --up:#22c55e;--down:#f04444;--up-bg:#0f2418;--down-bg:#2a1111;--warn:#facc15;--warn-bg:#2a2208;
 }
-*{box-sizing:border-box}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+body{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 button{font-family:inherit}
-a{color:var(--gold-ink)}
-header{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:rgba(10,10,10,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{font-size:20px;font-weight:800;letter-spacing:-.02em}.logo span{color:var(--gold)}
-.btn{background:var(--gold);color:#000;border:0;padding:10px 14px;border-radius:10px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}
+a{color:var(--gold)}
+header{position:sticky;top:0;z-index:20;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 10px;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.logo img{width:28px;height:28px;border-radius:8px}
+.logo span{color:var(--gold)}
+.btn{background:var(--gold);color:#000;border:0;padding:10px 14px;border-radius:11px;font-weight:800;font-size:14px;cursor:pointer;white-space:nowrap}
 .btn:disabled{opacity:.4;cursor:default}
 .btn.ghost{background:var(--field);color:var(--text);border:1px solid var(--border-2)}
+.btn.buy{background:var(--up);color:#000}
 .btn.sell{background:var(--down);color:#fff}
-.btn.full{width:100%;padding:14px;font-size:15px}
-.wallet{display:flex;align-items:center;gap:8px;background:var(--field);border:1px solid var(--border-2);border-radius:10px;padding:7px 10px;font-size:13px;font-weight:700;cursor:pointer}
+.btn.full{width:100%;padding:15px;font-size:15.5px}
+.wallet{display:flex;align-items:center;gap:8px;background:var(--field);border:1px solid var(--border-2);border-radius:11px;padding:7px 10px;font-size:13px;font-weight:700;cursor:pointer}
 .wallet .dot{width:8px;height:8px;border-radius:50%;background:var(--up)}
 .wallet small{color:var(--sub);font-weight:600}
 main{max-width:720px;margin:0 auto;padding:12px 16px 30px}
-.search{display:flex;gap:8px;margin:4px 0 12px}
-input,select{width:100%;background:var(--field);border:1px solid var(--border-2);color:var(--text);padding:11px 12px;border-radius:10px;font-size:15px;font-family:inherit}
-input:focus{outline:none;border-color:var(--gold)}
-.tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
-.tab{padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--sub);cursor:pointer;white-space:nowrap;font-weight:600}
-.tab.on{background:var(--gold);border-color:var(--gold);color:#000;font-weight:800}
-.row{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:11px 12px;margin-bottom:8px;cursor:pointer}
-.row:active{border-color:var(--border-2)}
-.av{width:40px;height:40px;border-radius:50%;background:var(--field);flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold)}
+input,select{width:100%;background:var(--field);border:1px solid var(--border-2);color:var(--text);padding:12px;border-radius:11px;font-size:16px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--gold)}
+.search{margin:4px 0 10px}
+.tabs{display:flex;gap:7px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:7px 13px;border-radius:999px;background:var(--card);border:1px solid var(--border);font-size:13px;color:var(--sub);cursor:pointer;white-space:nowrap;font-weight:700}
+.tab.on{background:var(--gold);border-color:var(--gold);color:#000}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 2px 10px;font-size:12px;color:var(--sub)}
+.safe-toggle{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border-2);background:var(--field);color:var(--text);border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:800;cursor:pointer}
+.safe-toggle .sw{width:30px;height:18px;border-radius:99px;background:var(--border-2);position:relative;transition:background .2s}
+.safe-toggle .sw:after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s}
+.safe-toggle.on{border-color:#1f5c36;background:var(--up-bg)}
+.safe-toggle.on .sw{background:var(--up)}.safe-toggle.on .sw:after{left:14px}
+.live{display:inline-flex;align-items:center;gap:5px}
+.live i{width:6px;height:6px;border-radius:50%;background:var(--up);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.row{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--border);border-radius:15px;padding:11px 11px 11px 12px;margin-bottom:8px;cursor:pointer}
+.row:active{background:var(--card-2)}
+.av{width:42px;height:42px;border-radius:50%;background:var(--field);flex-shrink:0;object-fit:cover;display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold);position:relative}
+.av-wrap{position:relative;flex-shrink:0}
+.rdot{position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;border:2px solid var(--card);background:var(--border-2)}
+.rdot.good{background:var(--up)}.rdot.mid{background:var(--warn)}.rdot.bad{background:var(--down)}
 .grow{flex:1;min-width:0}
 .nm{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .nm span{color:var(--sub);font-weight:500;font-size:13px;margin-left:4px}
-.meta{color:var(--sub);font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.meta{color:var(--sub);font-size:12px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tag{display:inline-block;font-size:10.5px;font-weight:800;border-radius:6px;padding:1px 6px;margin-right:5px;vertical-align:1px}
+.tag.curve{background:var(--gold-bg);color:var(--gold)}.tag.grad{background:#101a2e;color:#7fb2ff}
 .px{text-align:right;flex-shrink:0}
 .px b{display:block;font-size:14px}
 .chg{font-size:12px;font-weight:700}
 .up{color:var(--up)}.down{color:var(--down)}
+.qb{flex-shrink:0;background:var(--up-bg);color:var(--up);border:1px solid #1f5c36;border-radius:10px;padding:8px 9px;font-weight:800;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.qb:disabled{opacity:.5}
 .empty{text-align:center;color:var(--sub);padding:36px 16px;font-size:14px;line-height:1.5}
 .note{background:var(--gold-bg);border:1px solid var(--gold-line);color:#e9dfbf;border-radius:12px;padding:11px 13px;font-size:13px;line-height:1.5;margin-bottom:12px}
 .note.warn{background:var(--down-bg);border-color:#4a1d1d;color:#f6c9c9}
+.note.good{background:var(--up-bg);border-color:#1f5c36;color:#c6f1d5}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:flex-end;justify-content:center;z-index:50}
 .sheet-bg.open{display:flex}
-.sheet{background:var(--bg);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;border-top:1px solid var(--border);padding:18px 16px calc(24px + env(safe-area-inset-bottom,0px));position:relative}
-.x{position:absolute;top:12px;right:14px;background:none;border:0;color:var(--sub);font-size:24px;cursor:pointer}
-.tk-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-right:30px}
+.sheet{background:var(--bg);width:100%;max-width:720px;max-height:93vh;overflow-y:auto;border-radius:22px 22px 0 0;border-top:1px solid var(--border);padding:16px 16px calc(24px + env(safe-area-inset-bottom,0px));position:relative}
+.grab{width:38px;height:5px;border-radius:9px;background:var(--border-2);margin:0 auto 12px}
+.x{position:absolute;top:14px;right:14px;background:var(--field);border:1px solid var(--border-2);color:var(--sub);width:32px;height:32px;border-radius:50%;font-size:18px;line-height:1;cursor:pointer}
+.tk-head{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding-right:40px}
 .tk-head h2{margin:0;font-size:19px}
-.tk-price{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.tk-price{font-size:28px;font-weight:800;letter-spacing:-.02em}
 .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
-.st{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:9px}
+.st{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:9px 10px}
 .st .l{font-size:11px;color:var(--sub)}.st .v{font-size:14px;font-weight:700;margin-top:2px}
-.chart{width:100%;height:340px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--card)}
+.chart{width:100%;height:320px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:var(--card)}
 .chart iframe{width:100%;height:100%;border:0}
-.risk{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px 13px;margin:12px 0;font-size:13px}
-.pill{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px}
-.pill.good{background:var(--up-bg);color:var(--up)}.pill.mid{background:#2a2208;color:var(--warn)}.pill.bad{background:var(--down-bg);color:var(--down)}
-.risk ul{margin:6px 0 0;padding-left:18px;color:var(--sub);font-size:12px}
-.side{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border:1px solid var(--border);border-radius:12px;padding:4px;margin-top:14px}
-.side div{text-align:center;padding:10px;border-radius:9px;font-weight:800;color:var(--sub);cursor:pointer}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 13px;margin:12px 0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:800;font-size:14px}
+.pill{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap}
+.pill.good{background:var(--up-bg);color:var(--up)}.pill.mid{background:var(--warn-bg);color:var(--warn)}.pill.bad{background:var(--down-bg);color:var(--down)}.pill.wait{background:var(--field);color:var(--sub)}
+.check{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--border);font-size:13px}
+.check:first-of-type{margin-top:8px}
+.check span:first-child{color:var(--sub)}
+.check b.good{color:var(--up)}.check b.mid{color:var(--warn)}.check b.bad{color:var(--down)}
+.side{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border:1px solid var(--border);border-radius:13px;padding:4px;margin-top:14px}
+.side div{text-align:center;padding:11px;border-radius:10px;font-weight:800;color:var(--sub);cursor:pointer}
 .side .b.on{background:var(--up);color:#000}.side .s.on{background:var(--down);color:#fff}
-label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
+label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px;line-height:1.4}
 .presets{display:flex;gap:6px;margin-top:8px}
-.presets button{flex:1;background:var(--field);border:1px solid var(--border-2);color:var(--text);border-radius:9px;padding:8px 0;font-weight:700;font-size:13px;cursor:pointer}
+.presets button{flex:1;background:var(--field);border:1px solid var(--border-2);color:var(--text);border-radius:10px;padding:9px 0;font-weight:700;font-size:13px;cursor:pointer}
+.presets button:disabled{opacity:.4}
 .quote{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 13px;margin-top:12px;font-size:13px}
-.quote div{display:flex;justify-content:space-between;padding:4px 0;color:var(--sub)}
-.quote b{color:var(--text)}
+.quote div{display:flex;justify-content:space-between;gap:10px;padding:4px 0;color:var(--sub)}
+.quote b{color:var(--text);text-align:right}
+.progress{height:6px;background:var(--field);border-radius:3px;overflow:hidden;margin-top:6px}
+.progress div{height:100%;background:var(--gold)}
 .fine{font-size:11.5px;color:var(--faint);line-height:1.5;margin-top:10px}
 .links{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;margin-top:12px}
 .links a{text-decoration:none;font-weight:700}
-.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(10,10,10,.95);border-top:1px solid var(--border);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(10,10,10,.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;padding:6px 0 calc(6px + env(safe-area-inset-bottom,0px))}
 .nav button{flex:1;background:none;border:0;color:var(--sub);font-size:11px;font-weight:700;padding:6px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
-.nav button .i{font-size:19px}
+.nav button .i{font-size:19px;line-height:1}
 .nav button.on{color:var(--gold)}
-.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:100;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#fff;color:#000;padding:10px 16px;border-radius:999px;font-size:13px;font-weight:700;z-index:100;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1}
-.bal{background:linear-gradient(135deg,#1d1707,#121212);border:1px solid var(--gold-line);border-radius:16px;padding:16px;margin-bottom:12px}
-.bal .l{font-size:12px;color:var(--gold-ink);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-.bal .big{font-size:30px;font-weight:800;margin:4px 0 2px}
-.bal .s{font-size:13px;color:var(--sub)}
+.hero{background:linear-gradient(135deg,#1d1707,#131313 70%);border:1px solid var(--gold-line);border-radius:18px;padding:16px;margin-bottom:12px}
+.hero .l{font-size:12px;color:var(--gold);font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.hero .big{font-size:32px;font-weight:800;margin:4px 0 2px;letter-spacing:-.02em}
+.hero .s{font-size:13px;color:var(--sub)}
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
-.app-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1d1707,#121212);border:1px solid var(--gold-line);border-radius:14px;padding:12px;margin-bottom:12px}
+.app-card{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,#1d1707,#131313);border:1px solid var(--gold-line);border-radius:15px;padding:12px;margin-bottom:12px}
 .app-card img{width:44px;height:44px;border-radius:11px;flex-shrink:0}
 .app-card .t{font-weight:800;font-size:14px}.app-card .s{font-size:12px;color:var(--sub);margin-top:2px}
 .app-card .btn{padding:8px 12px;font-size:13px}
@@ -111,51 +140,64 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
 .inst-step .n{width:28px;height:28px;border-radius:50%;background:var(--gold);color:#000;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .inst-step .ico{display:inline-flex;align-items:center;justify-content:center;background:var(--field);border:1px solid var(--border-2);border-radius:7px;padding:1px 7px;font-weight:700;margin:0 2px}
 .ok-badge{display:inline-block;background:var(--up-bg);color:var(--up);font-weight:800;border-radius:999px;padding:4px 10px;font-size:12px}
+.linkbox{display:flex;gap:8px;align-items:center;background:var(--field);border:1px solid var(--border-2);border-radius:12px;padding:10px 12px;font-size:13px;word-break:break-all;margin:10px 0}
+h2.page{margin:6px 0 12px;font-size:22px}
+.section{font-size:12px;font-weight:800;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin:18px 2px 8px}
+.pnl{font-size:12px;font-weight:700;margin-top:2px}
 </style>
 </head>
 <body>
 <header>
-  <div class="logo">Bull<span>ed</span></div>
+  <div class="logo"><img src="icons/icon-180.png" alt=""><div>Bull<span>ed</span></div></div>
   <div id="walletBox"></div>
 </header>
 
 <main>
   <div id="view-market">
     <div id="appCard"></div>
-    <div class="search">
-      <input id="q" placeholder="Search coin or paste mint address" autocomplete="off" autocapitalize="off" spellcheck="false">
+    <div class="search"><input id="q" placeholder="Search coin or paste a mint address" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+    <div class="tabs" id="feedTabs">
+      <div class="tab on" data-feed="hot">🔥 Hot</div>
+      <div class="tab" data-feed="new">🌱 New</div>
+      <div class="tab" data-feed="grad">🎓 Graduating</div>
+      <div class="tab" data-feed="promo">📣 Promoted</div>
     </div>
-    <div class="tabs">
-      <div class="tab on" data-list="trending">🔥 Trending</div>
-      <div class="tab" data-list="top">🚀 Top boosted</div>
-      <div class="tab" data-list="new">🌱 New pairs</div>
+    <div class="toolbar">
+      <button class="safe-toggle" id="safeBtn" onclick="toggleSafe()"><span class="sw"></span>🛡 Safe mode</button>
+      <span class="live"><i></i>Live</span>
     </div>
+    <div id="feedNote"></div>
     <div id="list"><div class="empty">Loading coins…</div></div>
+    <p class="fine" style="text-align:center">Market data from <a href="https://www.geckoterminal.com" target="_blank" rel="noopener">GeckoTerminal</a> and <a href="https://dexscreener.com" target="_blank" rel="noopener">DexScreener</a> · risk data from <a href="https://rugcheck.xyz" target="_blank" rel="noopener">RugCheck</a></p>
   </div>
 
-  <div id="view-holdings" class="hide">
-    <div id="holdings"></div>
-  </div>
+  <div id="view-holdings" class="hide"><div id="holdings"></div></div>
+  <div id="view-earn" class="hide"><div id="earn"></div></div>
 
   <div id="view-settings" class="hide">
-    <h2 style="margin:6px 0 10px">Settings</h2>
+    <h2 class="page">Settings</h2>
     <div class="app-card" style="margin-bottom:14px">
       <img src="icons/icon-180.png" alt="">
       <div class="grow"><div class="t">Bulled app</div><div class="s" id="appStatus">Put Bulled on your home screen</div></div>
       <button class="btn" id="appBtn" onclick="openInstall()">Get the app</button>
     </div>
     <div class="note">Bulled never asks for your seed phrase or private key. Every trade is approved in your Phantom wallet.</div>
+    <label>⚡ Quick buy amount (the one-tap buy button on each coin)</label>
+    <select id="set-quick">
+      <option value="0.01">0.01 SOL</option><option value="0.05">0.05 SOL</option><option value="0.1">0.1 SOL</option>
+      <option value="0.25">0.25 SOL</option><option value="0.5">0.5 SOL</option><option value="1">1 SOL</option>
+    </select>
+    <label>Price protection — the trade cancels if the price jumps more than this before it goes through (you're never charged extra)</label>
+    <select id="set-slip">
+      <option value="100">1%</option><option value="300">3%</option><option value="500">5%</option>
+      <option value="1000">10%</option><option value="2000">20%</option><option value="3000">30%</option>
+    </select>
+    <label>Network speed</label>
+    <select id="set-prio">
+      <option value="100000">Standard · 0.0001 SOL</option><option value="200000">Fast · 0.0002 SOL</option><option value="1000000">Turbo · 0.001 SOL</option>
+    </select>
     <label>Custom Solana RPC URL (optional — Bulled has one built in)</label>
     <input id="set-rpc" placeholder="Using Bulled's built-in RPC" autocomplete="off" spellcheck="false">
-    <label>Price protection — trade cancels if the price jumps more than this before it goes through (you're never charged extra)</label>
-    <select id="set-slip">
-      <option value="50">0.5%</option><option value="100">1%</option><option value="300">3%</option>
-      <option value="500">5%</option><option value="1000">10%</option><option value="2000">20%</option>
-    </select>
-    <label>Priority fee cap (faster confirmation)</label>
-    <select id="set-prio">
-      <option value="100000">Low · 0.0001 SOL</option><option value="200000">Normal · 0.0002 SOL</option><option value="1000000">Fast · 0.001 SOL</option><option value="5000000">Turbo · 0.005 SOL</option>
-    </select>
     <button class="btn full" style="margin-top:18px" onclick="saveSettings()">Save</button>
     <p class="fine">Settings are saved on this device only.</p>
   </div>
@@ -164,6 +206,7 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
 <nav class="nav">
   <button class="on" data-view="market"><span class="i">📈</span>Market</button>
   <button data-view="holdings"><span class="i">💼</span>Holdings</button>
+  <button data-view="earn"><span class="i">🎁</span>Earn</button>
   <button data-view="settings"><span class="i">⚙️</span>Settings</button>
 </nav>
 
@@ -173,70 +216,85 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px}
 <div class="toast" id="toast"></div>
 
 <script>
+// ================= Owner settings =================
+const FEE_WALLET = "H2XUGjettEcEnRd7DVLCr9PMHJqXzP4PvjHd6qeuqbA5";  // your 0.45% goes here
+const BULLED_FEE_BPS = 45;        // 0.45% on every buy and sell
+const REF_SHARE_BPS = 3000;       // referrers get 30% of Bulled's fee (paid out of your 0.45%, traders pay the same)
+const DEFAULT_RPC = "https://mainnet.helius-rpc.com/?api-key=52f6a349-9632-473b-b3b9-66228fc1115b";
+
+// ================= Constants =================
 const SOL_MINT = "So11111111111111111111111111111111111111112";
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const TOKEN22_PROGRAM = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
-// Owner settings — your 0.45% goes to FEE_WALLET on every buy and sell.
-const FEE_WALLET = "H2XUGjettEcEnRd7DVLCr9PMHJqXzP4PvjHd6qeuqbA5";  // your 0.45% goes here
-const BULLED_FEE_BPS = 45;      // 0.45%
-const DEFAULT_RPC = "https://mainnet.helius-rpc.com/?api-key=52f6a349-9632-473b-b3b9-66228fc1115b";
+const PUMP_ID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
+const AMM_ID = "pAMMBay6oceH9fJKBRHGP5D4bD4sWpmSwMn52FMfXEA";
+const PFEE_ID = "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
+const ATA_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
+const SYS_ID = "11111111111111111111111111111111";
+const AMM_GLOBAL_CONFIG = "ADyA8hdefvWN2dbGGWFotbzWxrAvLW83WG6QCVXvJKqw";
+const RENT_MIN = 890880;          // Solana won't let a wallet hold less than this, so tiny first payments to empty wallets fail
+const CURVE_FEE_BPS = 125n;       // pump.fun bonding curve: 0.95% protocol + 0.30% creator
+const CURVE_START_TOKENS = 793100000000000n;
 const DEX = "https://api.dexscreener.com";
+const GT = "https://api.geckoterminal.com/api/v2/networks/solana";
+const FEE_RECIPIENTS = ["62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV","7VtfL8fvgNfhz17qKRMjzQEXgbdpnHHHQRh54R9jP2RJ","7hTckgnGnLQR6sdH7YkqFTAA7VwTfYFaZ6EhEsU3saCX","9rPYyANsfQZw3DnDmKE3YCQF5E8oD89UXoHn9JFEhJUz","AVmoTthdrX6tKt4nDjco2D775W2YK3sDhxPcMmzUAmTY","CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM","FWsW1xNtWscwNmKv6wVsU1iTzRN6wmmk3MjxRP5tT7hz","G5UZAVbAf46s7cKWoyKu8kYTip9DGTpbLZ2qa9Aq69dP"];
+const MAYHEM_RECIPIENTS = ["GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS","4budycTjhs9fD6xw62VBducVTNgMgJJ5BgtKq7mAZwn6","8SBKzEQU4nLSzcwF4a74F2iaUDQyTfjGndn6qUWBnrpR","4UQeTP1T39KZ9Sfxzo3WR5skgsaP6NZa87BAkuazLEKH","8sNeir4QsLsJdYpc9RZacohhK1Y5FLU3nC5LXgYB4aa6","Fh9HmeLNUMVCvejxCtCL2DbYaRyBFVJ5xrWkLnMH6fdk","463MEnMeGyJekNZFQSTUABBEbLnvMTALbT6ZmsxAbAdq","6AUH3WEHucYZyC61hqpqYUWVto5qA5hjHuNQ32GNnNxA"];
+const BUYBACK_RECIPIENTS = ["5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD","9M4giFFMxmFGXtc3feFzRai56WbBqehoSeRE5GK7gf7","GXPFM2caqTtQYC2cJ5yJRi9VDkpsYZXzYdwYpGnLmtDL","3BpXnfJaUTiwXnJNe7Ej1rcbzqTTQUvLShZaWazebsVR","5cjcW9wExnJJiqgLjq7DEG75Pm6JBgE1hNv4B2vHXUW6","EHAAiTxcdDwQ3U4bU6YcMsQGaekdzLS3B5SmYo46kJtL","5eHhjP8JaYkz83CWwvGU2uMUXefd3AazWGx4gpcuEEYD","A7hAgCzFw14fejgCp387JUJRMNyz4j89JKnhtKU8piqW"];
+const DISC = {
+  curveBuy: [194,171,28,70,104,77,91,47],     // pump: buy_exact_quote_in_v2
+  curveSell: [93,246,130,60,231,233,64,178],  // pump: sell_v2
+  ammBuy: [198,46,21,82,180,217,232,112],     // pumpswap: buy_exact_quote_in
+  ammSell: [51,230,133,164,1,127,131,173],    // pumpswap: sell
+};
+// PumpSwap fee tiers by market cap in SOL (total bps), from pump.fun's fee page
+const AMM_TIERS = [[420,125],[1470,120],[2460,115],[3440,110],[4420,105],[9820,100],[14740,95],[19650,90],[24560,85],[29470,80],[34380,75],[39300,70],[44210,65],[49120,60],[54030,55],[58940,53],[63860,50],[68770,48],[73681,45],[78590,43],[83500,40],[88400,38],[93330,35],[98240,33],[Infinity,30]];
 
-// ---------- storage ----------
+// ================= Storage & helpers =================
 function ls(k, d){ try{ const v = localStorage.getItem("bulled_"+k); return v===null ? d : v; }catch{ return d; } }
 function lsSet(k, v){ try{ localStorage.setItem("bulled_"+k, v); }catch{} }
+function lsJSON(k, d){ try{ return JSON.parse(ls(k, "")) ?? d; }catch{ return d; } }
 const cfg = {
   get rpc(){ return ls("rpc","") || DEFAULT_RPC; },
   get slip(){ return Number(ls("slip","1000")); },
   get prio(){ return Number(ls("prio","200000")); },
+  get quick(){ return Number(ls("quick","0.1")); },
 };
-
-// ---------- helpers ----------
 const $ = id => document.getElementById(id);
 function esc(s){ return String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 function toast(msg, ms=2600){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"), ms); }
 function short(a){ return a ? a.slice(0,4)+"…"+a.slice(-4) : ""; }
-function usd(n){
-  n = Number(n); if(!isFinite(n)) return "—";
-  if(n >= 1e9) return "$"+(n/1e9).toFixed(2)+"B";
-  if(n >= 1e6) return "$"+(n/1e6).toFixed(2)+"M";
-  if(n >= 1e3) return "$"+(n/1e3).toFixed(1)+"K";
-  return "$"+n.toFixed(n < 1 ? 2 : 0);
-}
-// cleaner subscript format for tiny prices: $0.0₅1234
-function priceFmt(n){
-  n = Number(n); if(!isFinite(n) || n===0) return "—";
+function usd(n){ n = Number(n); if(!isFinite(n)) return "—"; const a=Math.abs(n), s=n<0?"-":"";
+  if(a >= 1e9) return s+"$"+(a/1e9).toFixed(2)+"B"; if(a >= 1e6) return s+"$"+(a/1e6).toFixed(2)+"M"; if(a >= 1e3) return s+"$"+(a/1e3).toFixed(1)+"K"; return s+"$"+a.toFixed(2); }
+function priceFmt(n){ n = Number(n); if(!isFinite(n) || n===0) return "—";
   if(n >= 1) return "$"+n.toLocaleString(undefined,{maximumFractionDigits:4});
   const s = n.toFixed(14); const m = s.match(/^0\.(0*)/); const z = m ? m[1].length : 0;
   if(z >= 4){ const sub = String(z).split("").map(d=>"₀₁₂₃₄₅₆₇₈₉"[d]).join(""); return "$0.0"+sub+s.slice(2+z, 6+z); }
-  return "$"+n.toPrecision(4);
-}
+  return "$"+n.toPrecision(4); }
 function pct(n){ n = Number(n); if(!isFinite(n)) return '<span class="chg">—</span>'; return `<span class="chg ${n>=0?"up":"down"}">${n>=0?"+":""}${n.toFixed(1)}%</span>`; }
 function ago(ts){ if(!ts) return ""; const m=(Date.now()-ts)/6e4; if(m<60) return Math.max(1,Math.round(m))+"m"; const h=m/60; if(h<48) return Math.round(h)+"h"; return Math.round(h/24)+"d"; }
 async function getJSON(url, opts){ const r = await fetch(url, opts); if(!r.ok){ let t=""; try{t=await r.text();}catch{} throw new Error(r.status+" "+t.slice(0,200)); } return r.json(); }
 function isMint(s){ return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s); }
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const fmtSol = l => (Number(l)/1e9).toLocaleString(undefined,{maximumFractionDigits:5});
+const fmtTok = (t, d) => (Number(t)/10**d).toLocaleString(undefined,{maximumFractionDigits:2});
+let SOL_USD = 0;
 
-// ---------- wallet ----------
-let wallet = null;      // base58 pubkey string
-let solBal = null;      // SOL
+// ================= Wallet =================
+let wallet = null, solBal = null;
 function provider(){ const p = window.phantom?.solana || window.solana; return p && p.isPhantom ? p : null; }
 function isMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent); }
 function phantomBrowseLink(){ return "https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin); }
-
 function renderWallet(){
-  const box = $("walletBox");
-  if(wallet){
-    box.innerHTML = `<div class="wallet" onclick="walletMenu()"><span class="dot"></span>${short(wallet)} <small>${solBal===null?"":solBal.toFixed(3)+" SOL"}</small></div>`;
-  } else {
-    box.innerHTML = `<button class="btn" onclick="connect()">Connect Phantom</button>`;
-  }
+  $("walletBox").innerHTML = wallet
+    ? `<div class="wallet" onclick="walletMenu()"><span class="dot"></span>${short(wallet)} <small>${solBal===null?"":solBal.toFixed(3)+" SOL"}</small></div>`
+    : `<button class="btn" onclick="connect()">Connect Phantom</button>`;
 }
 async function connect(){
   const p = provider();
   if(!p){
     if(isMobile()){ location.href = phantomBrowseLink(); return; }
-    openSheetHTML(`<button class="x" onclick="closeSheet()">×</button><h2 style="margin:0 0 8px">Phantom not found</h2>
-      <p style="color:var(--sub);font-size:14px;line-height:1.5">Install the Phantom browser extension, then reload this page. On your phone, open this site inside the Phantom app's browser.</p>
+    openSheetHTML(`<h2 style="margin:0 0 8px">Phantom not found</h2>
+      <p style="color:var(--sub);font-size:14px;line-height:1.5">Install the Phantom browser extension, then reload this page. On your phone, open Bulled inside the Phantom app's browser.</p>
       <a class="btn full" style="display:block;text-align:center;text-decoration:none" href="https://phantom.app/download" target="_blank" rel="noopener">Get Phantom</a>`);
     return;
   }
@@ -244,18 +302,17 @@ async function connect(){
     const res = await p.connect();
     wallet = res.publicKey.toString();
     renderWallet(); refreshBalance(); toast("Wallet connected");
-    if(!$("view-holdings").classList.contains("hide")) renderHoldings();
-  }catch(e){ toast("Connection cancelled"); }
+    rerenderView();
+  }catch{ toast("Connection cancelled"); }
 }
 function walletMenu(){
-  openSheetHTML(`<button class="x" onclick="closeSheet()">×</button><h2 style="margin:0 0 4px">Wallet</h2>
+  openSheetHTML(`<h2 style="margin:0 0 4px">Wallet</h2>
     <p style="color:var(--sub);font-size:13px;word-break:break-all">${esc(wallet)}</p>
     <div class="links"><a href="https://solscan.io/account/${esc(wallet)}" target="_blank" rel="noopener">View on Solscan ↗</a></div>
-    <button class="btn ghost full" style="margin-top:16px" onclick="copyAddr()">Copy address</button>
+    <button class="btn ghost full" style="margin-top:16px" onclick="navigator.clipboard?.writeText(wallet).then(()=>toast('Address copied'))">Copy address</button>
     <button class="btn ghost full" style="margin-top:8px" onclick="disconnect()">Disconnect</button>`);
 }
-function copyAddr(){ navigator.clipboard?.writeText(wallet).then(()=>toast("Address copied"), ()=>toast("Couldn't copy")); }
-async function disconnect(){ try{ await provider()?.disconnect(); }catch{} wallet=null; solBal=null; renderWallet(); closeSheet(); if(!$("view-holdings").classList.contains("hide")) renderHoldings(); }
+async function disconnect(){ try{ await provider()?.disconnect(); }catch{} wallet=null; solBal=null; renderWallet(); closeSheet(); rerenderView(); }
 
 async function rpc(method, params){
   const j = await getJSON(cfg.rpc, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({jsonrpc:"2.0", id:1, method, params})});
@@ -264,34 +321,275 @@ async function rpc(method, params){
 }
 async function refreshBalance(){
   if(!wallet) return;
-  try{ const r = await rpc("getBalance", [wallet, {commitment:"confirmed"}]); solBal = r.value/1e9; }
-  catch{ solBal = null; }
+  try{ const r = await rpc("getBalance", [wallet, {commitment:"confirmed"}]); solBal = r.value/1e9; }catch{ solBal = null; }
   renderWallet();
 }
-async function tokenAccounts(){
+async function lamportsOf(addr){ try{ return (await rpc("getBalance", [addr, {commitment:"confirmed"}])).value; }catch{ return null; } }
+async function tokenAccounts(owner = wallet){
   const out = {};
   for(const prog of [TOKEN_PROGRAM, TOKEN22_PROGRAM]){
-    const r = await rpc("getParsedTokenAccountsByOwner", [wallet, {programId: prog}, {encoding:"jsonParsed", commitment:"confirmed"}]);
+    const r = await rpc("getParsedTokenAccountsByOwner", [owner, {programId: prog}, {encoding:"jsonParsed", commitment:"confirmed"}]);
     for(const a of r.value){
-      const info = a.account.data.parsed.info; const ta = info.tokenAmount;
-      if(!ta || ta.amount === "0") continue;
+      const info = a.account.data.parsed.info, ta = info.tokenAmount;
+      if(!ta || ta.amount === "0" || info.mint === SOL_MINT) continue;
       const cur = out[info.mint] || {mint:info.mint, raw:0n, decimals:ta.decimals};
       cur.raw += BigInt(ta.amount); out[info.mint] = cur;
     }
   }
   return Object.values(out).map(t => ({...t, ui: Number(t.raw) / 10**t.decimals}));
 }
-let decCache = {};
-async function decimalsOf(mint){
-  if(mint === SOL_MINT) return 9;
-  if(decCache[mint] != null) return decCache[mint];
-  try{ const r = await rpc("getTokenSupply", [mint]); decCache[mint] = r.value.decimals; return r.value.decimals; }catch{}
-  return null;
+
+// ================= Solana building blocks =================
+const W3 = () => window.solanaWeb3;
+const pk = s => new (W3().PublicKey)(s);
+const enc = s => new TextEncoder().encode(s);
+const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+function pda(seeds, prog){ return W3().PublicKey.findProgramAddressSync(seeds, typeof prog === "string" ? pk(prog) : prog)[0]; }
+function ataOf(owner, mint, tokenProg){ return pda([owner.toBytes(), tokenProg.toBytes(), mint.toBytes()], ATA_ID); }
+function u64le(n){ const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, BigInt(n), true); return b; }
+function ixData(disc, ...args){ const d = new Uint8Array(8 + args.reduce((s,a)=>s+(a.bool!==undefined?1:8),0)); d.set(disc,0); let o=8;
+  for(const a of args){ if(a.bool!==undefined){ d[o]=a.bool?1:0; o+=1; } else { d.set(u64le(a),o); o+=8; } } return d; }
+function b64bytes(b64){ const s = atob(b64); const u = new Uint8Array(s.length); for(let i=0;i<s.length;i++) u[i]=s.charCodeAt(i); return u; }
+function readU64(u, o){ return new DataView(u.buffer, u.byteOffset).getBigUint64(o, true); }
+function readKey(u, o){ return new (W3().PublicKey)(u.slice(o, o+32)); }
+function isDefaultKey(k){ return k.equals(W3().PublicKey.default); }
+const K = (pubkey, isWritable=false, isSigner=false) => ({pubkey, isWritable, isSigner});
+async function accountInfo(addr){
+  const r = await rpc("getAccountInfo", [addr, {encoding:"base64", commitment:"confirmed"}]);
+  return r.value ? { owner: r.value.owner, data: b64bytes(r.value.data[0]), lamports: r.value.lamports } : null;
+}
+async function multipleAccounts(addrs){
+  const r = await rpc("getMultipleAccounts", [addrs, {encoding:"base64", commitment:"confirmed"}]);
+  return r.value.map(v => v ? { owner: v.owner, data: b64bytes(v.data[0]) } : null);
+}
+function parseMint(mi){
+  const d = mi.data;
+  return { program: mi.owner, decimals: d[44], supply: readU64(d, 36),
+    mintAuthority: new DataView(d.buffer, d.byteOffset).getUint32(0, true) === 1,
+    freezeAuthority: new DataView(d.buffer, d.byteOffset).getUint32(46, true) === 1 };
+}
+function createAtaIdempotent(payer, owner, mint, tokenProg){
+  return new (W3().TransactionInstruction)({ programId: pk(ATA_ID), data: Uint8Array.of(1), keys: [
+    K(payer,true,true), K(ataOf(owner, mint, tokenProg),true), K(owner), K(mint), K(pk(SYS_ID)), K(tokenProg)]});
+}
+function syncNative(acct){ return new (W3().TransactionInstruction)({ programId: pk(TOKEN_PROGRAM), data: Uint8Array.of(17), keys: [K(acct,true)] }); }
+function closeAccount(acct, dest, owner){ return new (W3().TransactionInstruction)({ programId: pk(TOKEN_PROGRAM), data: Uint8Array.of(9), keys: [K(acct,true), K(dest,true), K(owner,false,true)] }); }
+function computeIxs(){ const units = 300000, W = W3();
+  return [W.ComputeBudgetProgram.setComputeUnitLimit({units}), W.ComputeBudgetProgram.setComputeUnitPrice({microLamports: Math.floor(cfg.prio * 1e6 / units)})]; }
+async function buildTx(ixs, user){
+  const W = W3();
+  const {value} = await rpc("getLatestBlockhash", [{commitment:"confirmed"}]);
+  return new W.VersionedTransaction(new W.TransactionMessage({payerKey: user, recentBlockhash: value.blockhash, instructions: ixs}).compileToV0Message());
 }
 
-// ---------- market data ----------
-let listMode = "trending";
-let pairCache = {};   // mint -> best pair
+// ================= Venues: pump.fun curve or PumpSwap pool =================
+// Figures out where a coin trades right now and reads live reserves from the chain.
+async function loadVenue(mint){
+  const m = pk(mint);
+  const bcAddr = pda([enc("bonding-curve"), m.toBytes()], PUMP_ID);
+  const [bc, mi] = await multipleAccounts([bcAddr.toBase58(), mint]);
+  if(!mi) return null;
+  const mintInfo = parseMint(mi);
+  if(bc && bc.data.length >= 81){
+    const d = bc.data;
+    const quoteMint = d.length >= 115 ? readKey(d, 83) : null;
+    const curve = { kind:"curve", mint, address: bcAddr, mintInfo, decimals: mintInfo.decimals, baseProgram: mintInfo.program,
+      vT: readU64(d,8), vS: readU64(d,16), rT: readU64(d,24), rS: readU64(d,32), complete: d[48] === 1,
+      creator: readKey(d,49), mayhem: d.length > 81 && d[81] === 1,
+      solPaired: !quoteMint || isDefaultKey(quoteMint) || quoteMint.toBase58() === SOL_MINT };
+    if(!curve.complete) return curve.solPaired ? curve : {kind:"unsupported", mint, mintInfo, reason:"usdc"};
+  }
+  // graduated (or never on pump.fun): look for the canonical PumpSwap pool
+  const auth = pda([enc("pool-authority"), m.toBytes()], PUMP_ID);
+  const poolAddr = pda([enc("pool"), Uint8Array.of(0,0), auth.toBytes(), m.toBytes(), pk(SOL_MINT).toBytes()], AMM_ID);
+  const pool = await accountInfo(poolAddr.toBase58());
+  if(!pool || pool.data.length < 245) return {kind:"unsupported", mint, mintInfo, reason:"notpump"};
+  const d = pool.data;
+  const baseAcct = readKey(d,139), quoteAcct = readKey(d,171);
+  const [ba, qa] = await multipleAccounts([baseAcct.toBase58(), quoteAcct.toBase58()]);
+  const vq = d.length >= 261 ? readU64(d,245) : 0n;   // low 64 bits of virtual_quote_reserves (0 on all pools today)
+  const venue = { kind:"amm", mint, address: poolAddr, mintInfo, decimals: mintInfo.decimals, baseProgram: mintInfo.program,
+    baseAcct, quoteAcct, coinCreator: readKey(d,211), mayhem: d[243] === 1, cashback: d[244] === 1,
+    baseRes: readU64(ba.data, 64), quoteRes: readU64(qa.data, 64) + vq };
+  const priceSol = Number(venue.quoteRes) / Number(venue.baseRes) / 10**(9 - venue.decimals);
+  const mcapSol = priceSol * Number(mintInfo.supply) / 10**venue.decimals;
+  venue.feeBps = BigInt(AMM_TIERS.find(t => mcapSol < t[0])[1]);
+  return venue;
+}
+function tradable(v){ return v && (v.kind === "curve" || v.kind === "amm"); }
+function curveProgress(v){ return v.kind === "curve" ? Math.max(0, Math.min(100, Number(10000n - v.rT * 10000n / CURVE_START_TOKENS) / 100)) : 100; }
+function venueFeePct(v){ return v.kind === "curve" ? "1.25%" : (Number(v.feeBps)/100).toFixed(2)+"%"; }
+
+// Pricing
+function quoteBuy(v, lamportsIn){
+  if(v.kind === "curve"){
+    const net = lamportsIn * 10000n / (10000n + CURVE_FEE_BPS);
+    let out = v.vT - (v.vT * v.vS) / (v.vS + net);
+    if(out > v.rT) out = v.rT;
+    return out > 0n ? out : 0n;
+  }
+  const net = lamportsIn * (10000n - v.feeBps) / 10000n;
+  return v.baseRes * net / (v.quoteRes + net);
+}
+function quoteSell(v, tokensIn){
+  const gross = v.kind === "curve" ? (v.vS * tokensIn) / (v.vT + tokensIn) : (v.quoteRes * tokensIn) / (v.baseRes + tokensIn);
+  const fee = v.kind === "curve" ? CURVE_FEE_BPS : v.feeBps;
+  return gross - (gross * fee) / 10000n;
+}
+
+// Bonding curve accounts (buy_exact_quote_in_v2 / sell_v2), in pump.fun's exact order
+function curveKeys(v, user, isBuy){
+  const m = pk(v.mint), wsol = pk(SOL_MINT), tp = pk(TOKEN_PROGRAM), bp = pk(v.baseProgram), pump = pk(PUMP_ID), pfee = pk(PFEE_ID);
+  const feeRec = pk(pick(v.mayhem ? MAYHEM_RECIPIENTS : FEE_RECIPIENTS)), buyback = pk(pick(BUYBACK_RECIPIENTS));
+  const creatorVault = pda([enc("creator-vault"), v.creator.toBytes()], pump);
+  const userVol = pda([enc("user_volume_accumulator"), user.toBytes()], pump);
+  const keys = [
+    K(pda([enc("global")], pump)), K(m), K(wsol), K(bp), K(tp), K(pk(ATA_ID)),
+    K(feeRec,true), K(ataOf(feeRec, wsol, tp),true), K(buyback,true), K(ataOf(buyback, wsol, tp),true),
+    K(v.address,true), K(ataOf(v.address, m, bp),true), K(ataOf(v.address, wsol, tp),true),
+    K(user,true,true), K(ataOf(user, m, bp),true), K(ataOf(user, wsol, tp),true),
+    K(creatorVault,true), K(ataOf(creatorVault, wsol, tp),true), K(pda([enc("sharing-config"), m.toBytes()], pfee)),
+  ];
+  if(isBuy) keys.push(K(pda([enc("global_volume_accumulator")], pump)));
+  keys.push(K(userVol,true), K(ataOf(userVol, wsol, tp),true), K(pda([enc("fee_config"), pump.toBytes()], pfee)), K(pfee),
+    K(pk(SYS_ID)), K(pda([enc("__event_authority")], pump)), K(pump));
+  return keys;
+}
+// PumpSwap fee recipients are read from pump.fun's live on-chain config
+let ammConfig = null;
+async function loadAmmConfig(){
+  if(ammConfig && Date.now() - ammConfig.t < 600000) return ammConfig;
+  const gc = await accountInfo(AMM_GLOBAL_CONFIG); const d = gc.data;
+  const keys = (o, n) => Array.from({length:n}, (_, i) => readKey(d, o + i*32)).filter(k => !isDefaultKey(k));
+  ammConfig = { t: Date.now(), protocol: keys(57, 8), reserved: [readKey(d,385), ...keys(418, 7)].filter(k => !isDefaultKey(k)), buyback: keys(643, 8) };
+  return ammConfig;
+}
+// PumpSwap accounts (buy_exact_quote_in / sell) plus the extra accounts pump.fun requires at the end
+async function ammKeys(v, user, isBuy){
+  const c = await loadAmmConfig();
+  const m = pk(v.mint), wsol = pk(SOL_MINT), tp = pk(TOKEN_PROGRAM), bp = pk(v.baseProgram), amm = pk(AMM_ID), pfee = pk(PFEE_ID);
+  const feeRec = pick(v.mayhem && c.reserved.length ? c.reserved : c.protocol), buyback = pick(c.buyback);
+  const vaultAuth = pda([enc("creator_vault"), v.coinCreator.toBytes()], amm);
+  const userVol = pda([enc("user_volume_accumulator"), user.toBytes()], amm);
+  const keys = [
+    K(v.address,true), K(user,true,true), K(pk(AMM_GLOBAL_CONFIG)), K(m), K(wsol),
+    K(ataOf(user, m, bp),true), K(ataOf(user, wsol, tp),true), K(v.baseAcct,true), K(v.quoteAcct,true),
+    K(feeRec), K(ataOf(feeRec, wsol, tp),true), K(bp), K(tp), K(pk(SYS_ID)), K(pk(ATA_ID)),
+    K(pda([enc("__event_authority")], amm)), K(amm), K(ataOf(vaultAuth, wsol, tp),true), K(vaultAuth),
+  ];
+  if(isBuy) keys.push(K(pda([enc("global_volume_accumulator")], amm)), K(userVol,true));
+  keys.push(K(pda([enc("fee_config"), amm.toBytes()], pfee)), K(pfee));
+  if(v.cashback){ keys.push(K(ataOf(userVol, wsol, tp),true)); if(!isBuy) keys.push(K(userVol,true)); }
+  if(!isDefaultKey(v.coinCreator)) keys.push(K(pda([enc("pool-v2"), m.toBytes()], amm)));
+  keys.push(K(buyback), K(ataOf(buyback, wsol, tp),true));
+  return keys;
+}
+
+// ================= Fees & referrals =================
+function bulledFee(lamports){ return lamports * BigInt(BULLED_FEE_BPS) / 10000n; }
+function getRef(){ const r = ls("ref",""); return isMint(r) && r !== FEE_WALLET ? r : null; }
+(function captureRef(){ try{ const r = new URLSearchParams(location.search).get("ref"); if(r && isMint(r) && !ls("ref","")) lsSet("ref", r); }catch{} })();
+let balCache = {};
+async function cachedLamports(addr){ const c = balCache[addr]; if(c && Date.now()-c.t < 60000) return c.v; const v = await lamportsOf(addr); balCache[addr] = {v, t:Date.now()}; return v; }
+// Splits the 0.45% between you and the referrer. Skips any payment Solana would reject (a first payment below its minimum to an empty wallet).
+async function feeTransfers(user, fee){
+  const W = W3(); const out = []; const ref = getRef();
+  let mine = fee, theirs = 0n;
+  if(ref && ref !== user.toBase58()){
+    theirs = fee * BigInt(REF_SHARE_BPS) / 10000n;
+    const rb = await cachedLamports(ref);
+    if(rb === null || rb + Number(theirs) < RENT_MIN) theirs = 0n;   // referrer wallet empty → their share goes to you
+    mine = fee - theirs;
+  }
+  const fb = await cachedLamports(FEE_WALLET);
+  if(mine > 0n && (fb === null || fb + Number(mine) >= RENT_MIN)) out.push(W.SystemProgram.transfer({fromPubkey:user, toPubkey:pk(FEE_WALLET), lamports:mine}));
+  if(theirs > 0n) out.push(W.SystemProgram.transfer({fromPubkey:user, toPubkey:pk(ref), lamports:theirs}));
+  return out;
+}
+
+// ================= Trade engine =================
+function planTrade(v, side, raw){
+  if(!tradable(v) || !raw || raw <= 0n) return null;
+  const slip = BigInt(cfg.slip);
+  if(side === "buy"){
+    const fee = bulledFee(raw), spend = raw - fee, out = quoteBuy(v, spend);
+    if(out === 0n) return null;
+    return { side, total: raw, fee, spend, out, minOut: out * (10000n - slip) / 10000n };
+  }
+  const solOut = quoteSell(v, raw), minSol = solOut * (10000n - slip) / 10000n, fee = bulledFee(minSol);
+  return { side, tokens: raw, solOut, minSol, fee, youGet: solOut - fee };
+}
+async function buildTrade(v, p, user){
+  const W = W3(), m = pk(v.mint), bp = pk(v.baseProgram), wsolAta = ataOf(user, pk(SOL_MINT), pk(TOKEN_PROGRAM));
+  const ixs = computeIxs(), fees = await feeTransfers(user, p.fee);
+  if(v.kind === "curve"){
+    if(p.side === "buy"){
+      ixs.push(createAtaIdempotent(user, user, m, bp), ...fees,
+        new W.TransactionInstruction({programId: pk(PUMP_ID), keys: curveKeys(v, user, true), data: ixData(DISC.curveBuy, p.spend, p.minOut)}));
+    } else {
+      ixs.push(new W.TransactionInstruction({programId: pk(PUMP_ID), keys: curveKeys(v, user, false), data: ixData(DISC.curveSell, p.tokens, p.minSol)}), ...fees);
+    }
+  } else {
+    if(p.side === "buy"){
+      ixs.push(createAtaIdempotent(user, user, m, bp), createAtaIdempotent(user, user, pk(SOL_MINT), pk(TOKEN_PROGRAM)),
+        W.SystemProgram.transfer({fromPubkey:user, toPubkey:wsolAta, lamports:p.spend}), syncNative(wsolAta), ...fees,
+        new W.TransactionInstruction({programId: pk(AMM_ID), keys: await ammKeys(v, user, true), data: ixData(DISC.ammBuy, p.spend, p.minOut, {bool:true})}),
+        closeAccount(wsolAta, user, user));
+    } else {
+      ixs.push(createAtaIdempotent(user, user, pk(SOL_MINT), pk(TOKEN_PROGRAM)),
+        new W.TransactionInstruction({programId: pk(AMM_ID), keys: await ammKeys(v, user, false), data: ixData(DISC.ammSell, p.tokens, p.minSol)}),
+        closeAccount(wsolAta, user, user), ...fees);
+    }
+  }
+  return buildTx(ixs, user);
+}
+async function waitConfirm(sig){
+  for(let i=0;i<30;i++){
+    await sleep(1500);
+    try{
+      const s = (await rpc("getSignatureStatuses", [[sig], {searchTransactionHistory:false}])).value[0];
+      if(s?.err) return false;
+      if(s && (s.confirmationStatus==="confirmed" || s.confirmationStatus==="finalized")) return true;
+    }catch{ return null; }
+  }
+  return null;
+}
+// Runs a planned trade end to end: build → Phantom approval → confirmation → P&L record.
+async function runTrade(v, p, onStage){
+  if(!W3()) throw new Error("Trading library didn't load. Reload the page.");
+  const user = pk(wallet);
+  if(p.side === "buy" && solBal != null && Number(p.total)/1e9 + 0.01 > solBal) throw new Error("Not enough SOL (keep ~0.01 SOL for network fees)");
+  onStage?.("Approve in Phantom…");
+  const before = await holdingOf(v.mint).catch(()=>null);
+  const tx = await buildTrade(v, p, user);
+  const {signature} = await provider().signAndSendTransaction(tx);
+  onStage?.("Confirming…");
+  const ok = await waitConfirm(signature);
+  if(ok !== false){
+    const after = await holdingOf(v.mint).catch(()=>null);
+    recordTrade(v.mint, p, before, after);
+  }
+  refreshBalance();
+  return {signature, ok};
+}
+
+// ================= P&L ledger (trades made in Bulled on this device) =================
+function ledger(){ return wallet ? lsJSON("pnl_"+wallet, {}) : {}; }
+function saveLedger(l){ if(wallet) lsSet("pnl_"+wallet, JSON.stringify(l)); }
+function recordTrade(mint, p, before, after){
+  const l = ledger(), e = l[mint] || {cost:0, tokens:0, realized:0};
+  const b = Number(before?.raw ?? 0n), a = Number(after?.raw ?? 0n);
+  if(p.side === "buy"){ e.cost += Number(p.total); e.tokens += a > b ? a - b : Number(p.out); }
+  else {
+    const sold = b > a ? b - a : Number(p.tokens), held = Math.max(e.tokens, sold);
+    const basis = held ? e.cost * sold / held : 0;
+    e.realized += Number(p.youGet) - basis; e.cost -= basis; e.tokens = Math.max(0, e.tokens - sold);
+  }
+  l[mint] = e; saveLedger(l);
+}
+
+// ================= Market feeds =================
+let feed = ls("feed","hot"), pairCache = {}, rowsShown = [], searching = false;
 function bestPairs(pairs){
   const by = {};
   for(const p of pairs || []){
@@ -305,483 +603,431 @@ function bestPairs(pairs){
 async function pairsFor(mints){
   const res = {};
   for(let i=0; i<mints.length; i+=30){
-    const chunk = mints.slice(i, i+30);
-    try{ Object.assign(res, bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${chunk.join(",")}`))); }catch{}
+    try{ Object.assign(res, bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mints.slice(i,i+30).join(",")}`))); }catch{}
   }
   return res;
 }
-async function loadList(){
-  const el = $("list"); el.innerHTML = `<div class="empty">Loading coins…</div>`;
+// GeckoTerminal pool → the same shape the rest of the app uses
+function gtRows(j){
+  const tokens = {}; for(const t of j.included || []) if(t.type === "token") tokens[t.id] = t.attributes;
+  const rows = [];
+  for(const p of j.data || []){
+    const a = p.attributes, dex = p.relationships?.dex?.data?.id || "", tid = p.relationships?.base_token?.data?.id || "";
+    if(!/pump/i.test(dex)) continue;
+    const t = tokens[tid] || {}, mint = t.address || tid.replace(/^solana_/, "");
+    if(!mint || mint === SOL_MINT) continue;
+    const row = { chainId:"solana", dexId: /swap/i.test(dex) ? "pumpswap" : "pumpfun", pairAddress: a.address,
+      baseToken:{address:mint, name:t.name || a.name?.split(" / ")[0] || "?", symbol:t.symbol || "?"},
+      priceUsd: a.base_token_price_usd, marketCap: Number(a.market_cap_usd || a.fdv_usd), fdv: Number(a.fdv_usd),
+      priceChange:{m5:Number(a.price_change_percentage?.m5), h1:Number(a.price_change_percentage?.h1), h24:Number(a.price_change_percentage?.h24)},
+      volume:{h24:Number(a.volume_usd?.h24)}, liquidity:{usd:Number(a.reserve_in_usd)},
+      pairCreatedAt: a.pool_created_at ? Date.parse(a.pool_created_at) : null,
+      info:{imageUrl: t.image_url && !/missing/.test(t.image_url) ? t.image_url : null} };
+    if(!pairCache[mint]) pairCache[mint] = row;
+    rows.push(row);
+  }
+  return rows;
+}
+async function gt(path){ return getJSON(`${GT}${path}`, {headers:{Accept:"application/json;version=20230302"}}); }
+async function fetchFeed(kind){
+  if(kind === "hot"){
+    const [a, b] = await Promise.all([gt("/trending_pools?include=base_token&duration=1h"), gt("/trending_pools?include=base_token&duration=1h&page=2").catch(()=>({data:[]}))]);
+    return gtRows({data:[...a.data, ...b.data], included:[...(a.included||[]), ...(b.included||[])]});
+  }
+  if(kind === "new"){
+    const [a, b] = await Promise.all([gt("/new_pools?include=base_token"), gt("/new_pools?include=base_token&page=2").catch(()=>({data:[]}))]);
+    return gtRows({data:[...a.data, ...b.data], included:[...(a.included||[]), ...(b.included||[])]}).sort((x,y)=>(y.pairCreatedAt||0)-(x.pairCreatedAt||0));
+  }
+  if(kind === "grad"){
+    let j = null;
+    for(const id of ["pump-fun","pumpfun"]){ try{ j = await gt(`/dexes/${id}/pools?include=base_token&sort=h24_volume_usd_desc`); if(j.data?.length) break; }catch{} }
+    if(!j) throw new Error("feed");
+    return gtRows(j).filter(r => r.dexId === "pumpfun").sort((x,y)=>(y.marketCap||0)-(x.marketCap||0));
+  }
+  // promoted: DexScreener paid boosts, clearly labeled
+  const boosts = await getJSON(`${DEX}/token-boosts/latest/v1`);
+  const mints = [...new Set((boosts||[]).filter(b => b.chainId === "solana").map(b => b.tokenAddress))].slice(0, 45);
+  const by = await pairsFor(mints);
+  return mints.map(m => by[m]).filter(Boolean);
+}
+const FEED_NOTES = {
+  hot: "", new: "",
+  grad: `<div class="note">Coins still on the pump.fun curve with the most market cap, closest to graduating.</div>`,
+  promo: `<div class="note">📣 These coins <b>paid DexScreener</b> to be promoted. Paid promotion isn't a sign a coin is safe.</div>`,
+};
+async function loadList(silent){
+  const el = $("list"); if(!silent) el.innerHTML = `<div class="empty">Loading coins…</div>`;
+  $("feedNote").innerHTML = FEED_NOTES[feed] || "";
   try{
-    let pairs;
-    if(listMode === "trending" || listMode === "top"){
-      const boosts = await getJSON(`${DEX}/token-boosts/${listMode==="top"?"top":"latest"}/v1`);
-      const mints = [...new Set((boosts||[]).filter(b => b.chainId === "solana").map(b => b.tokenAddress))].slice(0, 60);
-      const by = await pairsFor(mints);
-      pairs = mints.map(m => by[m]).filter(Boolean);
-    } else {
-      const prof = await getJSON(`${DEX}/token-profiles/latest/v1`);
-      const mints = [...new Set((prof||[]).filter(b => b.chainId === "solana").map(b => b.tokenAddress))].slice(0, 60);
-      const by = await pairsFor(mints);
-      pairs = mints.map(m => by[m]).filter(Boolean).sort((a,b)=>(b.pairCreatedAt||0)-(a.pairCreatedAt||0));
-    }
-    renderPairs(pairs);
-  }catch(e){
-    el.innerHTML = `<div class="empty">Couldn't load market data.<br><button class="btn ghost" style="margin-top:12px" onclick="loadList()">Try again</button></div>`;
+    const rows = await fetchFeed(feed);
+    if(searching) return;
+    renderRows(rows);
+  }catch{
+    if(!silent) el.innerHTML = `<div class="empty">Couldn't load coins right now.<br><button class="btn ghost" style="margin-top:12px" onclick="loadList()">Try again</button></div>`;
   }
 }
+function isPumpRow(p){ return p.dexId === "pumpfun" || p.dexId === "pumpswap" || /pump$/.test(p.baseToken?.address || ""); }
 function coinRow(p){
-  const img = p.info?.imageUrl;
-  const sym = p.baseToken.symbol || "?";
-  return `<div class="row" onclick="openToken('${esc(p.baseToken.address)}')">
-    ${img ? `<img class="av" src="${esc(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<div class="av">${esc(sym[0])}</div>`}
+  const img = p.info?.imageUrl, sym = p.baseToken.symbol || "?", mint = p.baseToken.address, r = riskCache[mint];
+  const tag = p.dexId === "pumpfun" ? `<span class="tag curve">CURVE</span>` : p.dexId === "pumpswap" ? `<span class="tag grad">GRAD</span>` : "";
+  return `<div class="row" data-mint="${esc(mint)}" onclick="openToken('${esc(mint)}')">
+    <div class="av-wrap">${img ? `<img class="av" src="${esc(img)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">` : `<div class="av">${esc(sym[0])}</div>`}<span class="rdot ${r?r.level:""}"></span></div>
     <div class="grow"><div class="nm">${esc(p.baseToken.name)}<span>${esc(sym)}</span></div>
-      <div class="meta">${p.dexId==="pumpfun"?'<b style="color:var(--gold)">● Curve</b> · ':""}MC ${usd(p.marketCap ?? p.fdv)} · Liq ${usd(p.liquidity?.usd)} · Vol ${usd(p.volume?.h24)}${p.pairCreatedAt?" · "+ago(p.pairCreatedAt):""}</div></div>
-    <div class="px"><b>${priceFmt(p.priceUsd)}</b>${pct(p.priceChange?.h24)}</div></div>`;
+      <div class="meta">${tag}${usd(p.marketCap ?? p.fdv)}${p.pairCreatedAt?" · "+ago(p.pairCreatedAt):""}</div></div>
+    <div class="px"><b>${priceFmt(p.priceUsd)}</b>${pct(p.priceChange?.h24)}</div>
+    ${isPumpRow(p) ? `<button class="qb" onclick="event.stopPropagation();quickBuy('${esc(mint)}', this)">⚡ ${cfg.quick}</button>` : ""}</div>`;
 }
-function renderPairs(pairs){
-  $("list").innerHTML = pairs.length ? pairs.map(coinRow).join("") : `<div class="empty">No coins found.</div>`;
+function renderRows(rows){
+  rowsShown = rows;
+  const safe = ls("safe","") === "on";
+  const shown = safe ? rows.filter(p => riskCache[p.baseToken.address]?.level !== "bad") : rows;
+  const hidden = rows.length - shown.length;
+  $("list").innerHTML = shown.length
+    ? shown.map(coinRow).join("") + (hidden ? `<p class="fine" style="text-align:center">🛡 Safe mode hid ${hidden} high-risk coin${hidden>1?"s":""}</p>` : "")
+    : `<div class="empty">${rows.length ? "🛡 Safe mode hid every coin in this list." : "No coins found."}</div>`;
+  scanRisks(rows.map(p => p.baseToken.address));
+}
+function toggleSafe(){
+  const on = ls("safe","") !== "on"; lsSet("safe", on ? "on" : "off");
+  $("safeBtn").classList.toggle("on", on);
+  toast(on ? "🛡 Safe mode on: hiding coins RugCheck flags as high risk" : "Safe mode off");
+  if(rowsShown.length) renderRows(rowsShown);
 }
 let qTimer;
 $("q").addEventListener("input", e => {
   clearTimeout(qTimer);
   const v = e.target.value.trim();
-  if(!v){ loadList(); return; }
+  if(!v){ searching = false; loadList(); return; }
+  searching = true;
   qTimer = setTimeout(async () => {
     if(isMint(v)){ openToken(v); return; }
-    $("list").innerHTML = `<div class="empty">Searching…</div>`;
+    $("list").innerHTML = `<div class="empty">Searching…</div>`; $("feedNote").innerHTML = "";
     try{
       const j = await getJSON(`${DEX}/latest/dex/search?q=${encodeURIComponent(v)}`);
-      const by = bestPairs(j.pairs);
-      renderPairs(Object.values(by).sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0)).slice(0,40));
+      renderRows(Object.values(bestPairs(j.pairs)).sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0)).slice(0,40));
     }catch{ $("list").innerHTML = `<div class="empty">Search failed. Try again.</div>`; }
   }, 350);
 });
-document.querySelectorAll(".tab").forEach(t => t.onclick = () => {
-  document.querySelectorAll(".tab").forEach(x => x.classList.remove("on")); t.classList.add("on");
-  listMode = t.dataset.list; $("q").value = ""; loadList();
+document.querySelectorAll("#feedTabs .tab").forEach(t => {
+  t.classList.toggle("on", t.dataset.feed === feed);
+  t.onclick = () => {
+    document.querySelectorAll("#feedTabs .tab").forEach(x => x.classList.remove("on")); t.classList.add("on");
+    feed = t.dataset.feed; lsSet("feed", feed); $("q").value = ""; searching = false; loadList();
+  };
 });
 
-// ---------- token sheet ----------
-let cur = null;        // {mint, pair}
-let side = "buy";
-let lastQuote = null;
-let holding = null;    // {raw, decimals, ui}
+// ================= Risk: RugCheck + Bulled on-chain checks =================
+let riskCache = {}, riskQueue = [], riskBusy = 0;
+function rcLevel(s){ return s == null ? "mid" : s <= 30 ? "good" : s <= 60 ? "mid" : "bad"; }
+async function rugcheck(mint){
+  const r = await getJSON(`https://api.rugcheck.xyz/v1/tokens/${mint}/report/summary`);
+  const s = r.score_normalised ?? r.score;
+  return { score: s, level: rcLevel(s), risks: (r.risks || []).slice(0, 6) };
+}
+// Light scan for list dots and Safe mode (2 at a time so RugCheck isn't flooded)
+function scanRisks(mints){
+  for(const m of mints) if(!riskCache[m] && !riskQueue.includes(m)) riskQueue.push(m);
+  pumpRiskQueue();
+}
+async function pumpRiskQueue(){
+  while(riskBusy < 2 && riskQueue.length){
+    const m = riskQueue.shift(); riskBusy++;
+    rugcheck(m).then(r => { riskCache[m] = r; paintRisk(m); }).catch(()=>{}).finally(() => { riskBusy--; pumpRiskQueue(); });
+  }
+}
+function paintRisk(m){
+  const r = riskCache[m];
+  document.querySelectorAll(`.row[data-mint="${m}"] .rdot`).forEach(d => d.className = "rdot " + r.level);
+  if(ls("safe","") === "on" && r.level === "bad" && !searching) renderRows(rowsShown);
+}
+// Full safety check for one coin: RugCheck + mint/freeze authority, dev holdings, top-holder concentration
+async function safetyReport(v, mint){
+  const items = [], rc = await rugcheck(mint).catch(()=>null);
+  if(rc) riskCache[mint] = {score: rc.score, level: rc.level, risks: rc.risks};
+  let score = 100;
+  const add = (label, value, level, penalty=0) => { items.push({label, value, level}); score -= penalty; };
+  const mi = v?.mintInfo;
+  if(mi){
+    add("Mint authority", mi.mintAuthority ? "Dev can print more" : "Revoked", mi.mintAuthority ? "bad" : "good", mi.mintAuthority ? 40 : 0);
+    add("Freeze authority", mi.freezeAuthority ? "Dev can freeze wallets" : "Revoked", mi.freezeAuthority ? "bad" : "good", mi.freezeAuthority ? 40 : 0);
+    const supply = Number(mi.supply);
+    try{
+      const exclude = new Set();
+      if(v.kind === "curve") exclude.add(ataOf(v.address, pk(mint), pk(v.baseProgram)).toBase58());
+      if(v.kind === "amm") exclude.add(v.baseAcct.toBase58());
+      const largest = (await rpc("getTokenLargestAccounts", [mint, {commitment:"confirmed"}])).value;
+      const top = largest.filter(a => !exclude.has(a.address)).slice(0, 10).reduce((s, a) => s + Number(a.amount), 0);
+      const share = supply ? top / supply * 100 : 0;
+      add("Top 10 holders", share.toFixed(1) + "%", share > 50 ? "bad" : share > 30 ? "mid" : "good", share > 50 ? 30 : share > 30 ? 15 : 0);
+    }catch{}
+    const creator = v.kind === "curve" ? v.creator : v.kind === "amm" ? v.coinCreator : null;
+    if(creator && !isDefaultKey(creator)){
+      try{
+        const r = await rpc("getTokenAccountsByOwner", [creator.toBase58(), {mint}, {encoding:"jsonParsed", commitment:"confirmed"}]);
+        const held = r.value.reduce((s, a) => s + Number(a.account.data.parsed.info.tokenAmount.amount), 0);
+        const share = supply ? held / supply * 100 : 0;
+        add("Dev holds", share < 0.05 ? "0%" : share.toFixed(1) + "%", share > 15 ? "bad" : share > 5 ? "mid" : "good", share > 15 ? 30 : share > 5 ? 15 : 0);
+      }catch{}
+    }
+  }
+  if(rc){
+    add("RugCheck score", rc.score != null ? Math.round(rc.score) + "/100" : "—", rc.level, rc.level === "bad" ? 25 : rc.level === "mid" ? 10 : 0);
+    score -= Math.min(20, rc.risks.filter(r => r.level === "danger").length * 10);
+  }
+  score = Math.max(0, score);
+  const level = !items.length ? "mid" : score >= 75 ? "good" : score >= 50 ? "mid" : "bad";
+  if(rc || mi) riskCache[mint] = {...(riskCache[mint]||{}), level: level === "bad" || riskCache[mint]?.level === "bad" ? "bad" : level};
+  return { score, level, items, risks: rc?.risks || [] };
+}
 
-function openSheetHTML(h){ $("sheet").innerHTML = h; $("sheetBg").classList.add("open"); }
-function closeSheet(){ $("sheetBg").classList.remove("open"); cur = null; lastQuote = null; }
+// ================= Token sheet =================
+let cur = null, side = "buy", holding = null;
+function openSheetHTML(h){ $("sheet").innerHTML = `<div class="grab"></div><button class="x" onclick="closeSheet()">×</button>` + h; $("sheetBg").classList.add("open"); }
+function closeSheet(){ $("sheetBg").classList.remove("open"); cur = null; }
+async function holdingOf(mint){ if(!wallet) return null; const t = await tokenAccounts(); return t.find(x => x.mint === mint) || null; }
 
 async function openToken(mint){
-  cur = {mint, pair: pairCache[mint] || null}; side = "buy"; lastQuote = null; holding = null;
-  openSheetHTML(`<button class="x" onclick="closeSheet()">×</button><div class="empty">Loading…</div>`);
-  if(!cur.pair){
-    try{ const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`)); cur.pair = by[mint] || null; }catch{}
-  }
-  if(!cur || cur.mint !== mint) return;
-  cur.curveState = "loading";
+  cur = {mint, pair: pairCache[mint] || null, state:"loading"}; side = "buy"; holding = null;
+  openSheetHTML(`<div class="empty">Loading…</div>`);
+  if(!cur.pair){ try{ const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`)); if(cur?.mint === mint) cur.pair = by[mint] || null; }catch{} }
+  if(cur?.mint !== mint) return;
   renderToken();
-  loadRisk(mint);
-  loadHolding(mint);
-  loadCurveFor(mint);
+  loadVenueFor(mint);
+  if(wallet) holdingOf(mint).then(h => { if(cur?.mint === mint){ holding = h; renderTrade(); } }).catch(()=>{});
 }
-async function loadCurveFor(mint){
+async function loadVenueFor(mint){
   try{
-    if(!window.solanaWeb3) throw new Error("lib");
-    const c = await loadCurve(mint);
-    if(!cur || cur.mint !== mint) return;
-    cur.curve = c; cur.curveState = "ok";
-  }catch{
-    if(!cur || cur.mint !== mint) return;
-    cur.curveState = "rpcfail";
-  }
+    if(!W3()) throw new Error("lib");
+    const v = await loadVenue(mint);
+    if(cur?.mint !== mint) return;
+    cur.venue = v; cur.state = "ok";
+  }catch{ if(cur?.mint !== mint) return; cur.state = "rpcfail"; }
   renderTrade();
+  const rep = await safetyReport(cur?.venue, mint);
+  if(cur?.mint !== mint) return;
+  cur.safety = rep; renderSafety(); renderTrade();
 }
 function renderToken(){
   const p = cur.pair, mint = cur.mint;
-  const name = p?.baseToken?.name || "Unknown token", sym = p?.baseToken?.symbol || short(mint);
-  const img = p?.info?.imageUrl;
-  const chart = p ? `<div class="chart"><iframe src="https://dexscreener.com/solana/${esc(p.pairAddress)}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=5" loading="lazy" title="Price chart"></iframe></div>` : "";
-  const bonding = p?.dexId === "pumpfun";
-  $("sheet").innerHTML = `<button class="x" onclick="closeSheet()">×</button>
+  const name = p?.baseToken?.name || "Unknown token", sym = p?.baseToken?.symbol || short(mint), img = p?.info?.imageUrl;
+  $("sheet").innerHTML = `<div class="grab"></div><button class="x" onclick="closeSheet()">×</button>
     <div class="tk-head">${img?`<img class="av" src="${esc(img)}" alt="">`:`<div class="av">${esc(sym[0])}</div>`}
       <div class="grow"><h2>${esc(name)} <span style="color:var(--sub);font-size:14px;font-weight:600">${esc(sym)}</span></h2>
-      <div class="meta" style="cursor:pointer" onclick="navigator.clipboard?.writeText('${esc(mint)}').then(()=>toast('Mint copied'))">${short(mint)} ⧉${bonding?" · on pump.fun curve":""}</div></div></div>
-    <div class="tk-price">${priceFmt(p?.priceUsd)} ${pct(p?.priceChange?.h24)}</div>
-    <div class="grid">
-      <div class="st"><div class="l">Market cap</div><div class="v">${usd(p?.marketCap ?? p?.fdv)}</div></div>
-      <div class="st"><div class="l">Liquidity</div><div class="v">${usd(p?.liquidity?.usd)}</div></div>
-      <div class="st"><div class="l">24h volume</div><div class="v">${usd(p?.volume?.h24)}</div></div>
-      <div class="st"><div class="l">1h</div><div class="v">${pct(p?.priceChange?.h1)}</div></div>
-      <div class="st"><div class="l">5m</div><div class="v">${pct(p?.priceChange?.m5)}</div></div>
-      <div class="st"><div class="l">Age</div><div class="v">${p?.pairCreatedAt?ago(p.pairCreatedAt):"—"}</div></div>
-    </div>
-    ${chart}
-    <div class="risk" id="risk"><span>RugCheck risk</span><span class="pill mid">Checking…</span></div>
+      <div class="meta" style="cursor:pointer" onclick="navigator.clipboard?.writeText('${esc(mint)}').then(()=>toast('Mint address copied'))">${short(mint)} ⧉</div></div></div>
+    <div class="tk-price" id="tkPrice">${priceFmt(p?.priceUsd)} ${pct(p?.priceChange?.h24)}</div>
+    <div class="grid" id="tkStats">${statsHTML(p)}</div>
+    <div class="chart"><iframe src="https://dexscreener.com/solana/${esc(mint)}?embed=1&loadChartSettings=0&trades=0&tabs=0&info=0&chartLeftToolbar=0&chartTheme=dark&theme=dark&chartStyle=1&chartType=usd&interval=5" loading="lazy" title="Price chart"></iframe></div>
+    <div class="panel" id="safety"><div class="panel-head"><span>🛡 Bulled Safety</span><span class="pill wait">Checking…</span></div></div>
     <div class="side"><div class="b on" onclick="setSide('buy')">Buy</div><div class="s" onclick="setSide('sell')">Sell</div></div>
     <div id="tradeBox"></div>
     <div class="links">
-      <a href="https://dexscreener.com/solana/${esc(p?.pairAddress||mint)}" target="_blank" rel="noopener">DexScreener ↗</a>
+      <a href="https://dexscreener.com/solana/${esc(mint)}" target="_blank" rel="noopener">DexScreener ↗</a>
       <a href="https://rugcheck.xyz/tokens/${esc(mint)}" target="_blank" rel="noopener">RugCheck ↗</a>
       <a href="https://solscan.io/token/${esc(mint)}" target="_blank" rel="noopener">Solscan ↗</a>
-      ${bonding?`<a href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">pump.fun ↗</a>`:""}
+      <a href="https://pump.fun/coin/${esc(mint)}" target="_blank" rel="noopener">pump.fun ↗</a>
     </div>
     <p class="fine">Trades are real, on-chain and final. Meme coins can go to zero. Only trade what you can afford to lose. Not financial advice.</p>`;
   renderTrade();
 }
-async function loadRisk(mint){
-  try{
-    const r = await getJSON(`https://api.rugcheck.xyz/v1/tokens/${mint}/report/summary`);
-    if(!cur || cur.mint !== mint) return;
-    const s = r.score_normalised ?? r.score;
-    const risks = (r.risks || []).slice(0, 5);
-    const lvl = s == null ? "mid" : s <= 30 ? "good" : s <= 60 ? "mid" : "bad";
-    const label = lvl === "good" ? "Lower risk" : lvl === "mid" ? "Caution" : "High risk";
-    cur.risk = lvl;
-    $("risk").outerHTML = `<div class="risk" id="risk" style="display:block"><div style="display:flex;justify-content:space-between;align-items:center"><span>RugCheck risk${s!=null?` · ${Math.round(s)}/100`:""}</span><span class="pill ${lvl}">${label}</span></div>
-      ${risks.length?`<ul>${risks.map(k=>`<li>${esc(k.name)}${k.level==="danger"?" ⚠️":""}</li>`).join("")}</ul>`:""}</div>`;
-    renderTrade();
-  }catch{
-    const el = $("risk"); if(el) el.innerHTML = `<span>RugCheck risk</span><span class="pill mid">Unavailable</span>`;
-  }
+function statsHTML(p){
+  return `<div class="st"><div class="l">Market cap</div><div class="v">${usd(p?.marketCap ?? p?.fdv)}</div></div>
+    <div class="st"><div class="l">Liquidity</div><div class="v">${usd(p?.liquidity?.usd)}</div></div>
+    <div class="st"><div class="l">24h volume</div><div class="v">${usd(p?.volume?.h24)}</div></div>
+    <div class="st"><div class="l">5m</div><div class="v">${pct(p?.priceChange?.m5)}</div></div>
+    <div class="st"><div class="l">1h</div><div class="v">${pct(p?.priceChange?.h1)}</div></div>
+    <div class="st"><div class="l">Age</div><div class="v">${p?.pairCreatedAt?ago(p.pairCreatedAt):"—"}</div></div>`;
 }
-async function loadHolding(mint){
-  if(!wallet) return;
-  try{
-    const toks = await tokenAccounts();
-    if(!cur || cur.mint !== mint) return;
-    holding = toks.find(t => t.mint === mint) || null;
-    if(holding) decCache[mint] = holding.decimals;
-    renderTrade();
-  }catch{}
+function renderSafety(){
+  const el = $("safety"); if(!el || !cur?.safety) return;
+  const s = cur.safety, label = {good:"Safer", mid:"Caution", bad:"High risk"}[s.level];
+  el.innerHTML = `<div class="panel-head"><span>🛡 Bulled Safety · ${s.score}/100</span><span class="pill ${s.level}">${label}</span></div>
+    ${s.items.map(i => `<div class="check"><span>${esc(i.label)}</span><b class="${i.level}">${esc(i.value)}</b></div>`).join("")}
+    ${s.risks.length ? `<div class="check" style="display:block"><span>RugCheck flags</span><div style="margin-top:4px">${s.risks.map(r => `<div style="font-size:12.5px;color:${r.level==="danger"?"var(--down)":"var(--sub)"}">${r.level==="danger"?"⚠️":"•"} ${esc(r.name)}</div>`).join("")}</div></div>` : ""}
+    <p class="fine" style="margin-bottom:0">Checks lower the odds of a rug but can't rule one out.</p>`;
 }
 function setSide(s){
-  side = s; lastQuote = null;
-  document.querySelector(".side .b").classList.toggle("on", s==="buy");
-  document.querySelector(".side .s").classList.toggle("on", s==="sell");
+  side = s;
+  document.querySelector(".side .b")?.classList.toggle("on", s==="buy");
+  document.querySelector(".side .s")?.classList.toggle("on", s==="sell");
   renderTrade();
 }
-// ---------- pump.fun direct trading ----------
-const W3 = () => window.solanaWeb3;
-const PUMP_ID = "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P";
-const PFEE_ID = "pfeeUxB6jkeY1Hxd7CsFCAjcbHA9rWtchMGdZ6VojVZ";
-const ATA_ID = "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL";
-const SYS_ID = "11111111111111111111111111111111";
-const PUMP_FEE_BPS = 125n;           // pump.fun curve fee: 0.95% protocol + 0.30% creator
-const FEE_RECIPIENTS = ["62qc2CNXwrYqQScmEdiZFFAnJR262PxWEuNQtxfafNgV","7VtfL8fvgNfhz17qKRMjzQEXgbdpnHHHQRh54R9jP2RJ","7hTckgnGnLQR6sdH7YkqFTAA7VwTfYFaZ6EhEsU3saCX","9rPYyANsfQZw3DnDmKE3YCQF5E8oD89UXoHn9JFEhJUz","AVmoTthdrX6tKt4nDjco2D775W2YK3sDhxPcMmzUAmTY","CebN5WGQ4jvEPvsVU4EoHEpgzq1VV7AbicfhtW4xC9iM","FWsW1xNtWscwNmKv6wVsU1iTzRN6wmmk3MjxRP5tT7hz","G5UZAVbAf46s7cKWoyKu8kYTip9DGTpbLZ2qa9Aq69dP"];
-const MAYHEM_RECIPIENTS = ["GesfTA3X2arioaHp8bbKdjG9vJtskViWACZoYvxp4twS","4budycTjhs9fD6xw62VBducVTNgMgJJ5BgtKq7mAZwn6","8SBKzEQU4nLSzcwF4a74F2iaUDQyTfjGndn6qUWBnrpR","4UQeTP1T39KZ9Sfxzo3WR5skgsaP6NZa87BAkuazLEKH","8sNeir4QsLsJdYpc9RZacohhK1Y5FLU3nC5LXgYB4aa6","Fh9HmeLNUMVCvejxCtCL2DbYaRyBFVJ5xrWkLnMH6fdk","463MEnMeGyJekNZFQSTUABBEbLnvMTALbT6ZmsxAbAdq","6AUH3WEHucYZyC61hqpqYUWVto5qA5hjHuNQ32GNnNxA"];
-const BUYBACK_RECIPIENTS = ["5YxQFdt3Tr9zJLvkFccqXVUwhdTWJQc1fFg2YPbxvxeD","9M4giFFMxmFGXtc3feFzRai56WbBqehoSeRE5GK7gf7","GXPFM2caqTtQYC2cJ5yJRi9VDkpsYZXzYdwYpGnLmtDL","3BpXnfJaUTiwXnJNe7Ej1rcbzqTTQUvLShZaWazebsVR","5cjcW9wExnJJiqgLjq7DEG75Pm6JBgE1hNv4B2vHXUW6","EHAAiTxcdDwQ3U4bU6YcMsQGaekdzLS3B5SmYo46kJtL","5eHhjP8JaYkz83CWwvGU2uMUXefd3AazWGx4gpcuEEYD","A7hAgCzFw14fejgCp387JUJRMNyz4j89JKnhtKU8piqW"];
-const DISC = { buyExactIn: [194,171,28,70,104,77,91,47], sell: [93,246,130,60,231,233,64,178] };
-
-const pk = s => new (W3().PublicKey)(s);
-const enc = s => new TextEncoder().encode(s);
-const pick = arr => arr[Math.floor(Math.random()*arr.length)];
-function pda(seeds, prog){ return W3().PublicKey.findProgramAddressSync(seeds, prog)[0]; }
-function ataOf(owner, mint, tokenProg){ return pda([owner.toBytes(), tokenProg.toBytes(), mint.toBytes()], pk(ATA_ID)); }
-function u64le(n){ const b = new Uint8Array(8); new DataView(b.buffer).setBigUint64(0, BigInt(n), true); return b; }
-function ixData(disc, a, b){ const d = new Uint8Array(24); d.set(disc,0); d.set(u64le(a),8); d.set(u64le(b),16); return d; }
-function b64bytes(b64){ const s = atob(b64); const u = new Uint8Array(s.length); for(let i=0;i<s.length;i++) u[i]=s.charCodeAt(i); return u; }
-function readU64(u, o){ return new DataView(u.buffer, u.byteOffset).getBigUint64(o, true); }
-
-async function accountInfo(addr){
-  const r = await rpc("getAccountInfo", [addr, {encoding:"base64", commitment:"confirmed"}]);
-  if(!r.value) return null;
-  return { owner: r.value.owner, data: b64bytes(r.value.data[0]) };
-}
-// Reads the coin's bonding curve straight from the chain.
-async function loadCurve(mint){
-  const m = pk(mint);
-  const bcAddr = pda([enc("bonding-curve"), m.toBytes()], pk(PUMP_ID));
-  const [bc, mi] = await Promise.all([accountInfo(bcAddr.toBase58()), accountInfo(mint)]);
-  if(!bc || bc.data.length < 81) return null;
-  const d = bc.data;
-  const quoteMint = d.length >= 115 ? new (W3().PublicKey)(d.slice(83,115)) : null;
-  return {
-    address: bcAddr,
-    vT: readU64(d,8), vS: readU64(d,16), rT: readU64(d,24), rS: readU64(d,32),
-    complete: d[48] === 1,
-    creator: new (W3().PublicKey)(d.slice(49,81)),
-    mayhem: d.length > 81 && d[81] === 1,
-    solPaired: !quoteMint || quoteMint.equals(W3().PublicKey.default) || quoteMint.toBase58() === SOL_MINT,
-    baseProgram: mi?.owner || TOKEN_PROGRAM,
-    decimals: mi ? mi.data[44] : 6,
-  };
-}
-function curveTradable(c){ return c && !c.complete && c.solPaired; }
-
-// Pricing (constant product on virtual reserves, same math as pump.fun)
-function quoteBuy(c, lamportsIn){           // lamportsIn = amount going into pump.fun (fees included)
-  const net = lamportsIn * 10000n / (10000n + PUMP_FEE_BPS);
-  let out = c.vT - (c.vT * c.vS) / (c.vS + net);
-  if(out > c.rT) out = c.rT;
-  return out > 0n ? out : 0n;
-}
-function quoteSell(c, tokensIn){             // returns SOL after pump.fun fee
-  const gross = (c.vS * tokensIn) / (c.vT + tokensIn);
-  return gross - (gross * PUMP_FEE_BPS) / 10000n;
-}
-function bulledFee(lamports){ return lamports * BigInt(BULLED_FEE_BPS) / 10000n; }
-
-function curveKeys(c, mint, user, isBuy){
-  const W = W3(), m = pk(mint), wsol = pk(SOL_MINT), tp = pk(TOKEN_PROGRAM), bp = pk(c.baseProgram), pump = pk(PUMP_ID), pfee = pk(PFEE_ID);
-  const feeRec = pk(pick(c.mayhem ? MAYHEM_RECIPIENTS : FEE_RECIPIENTS));
-  const buyback = pk(pick(BUYBACK_RECIPIENTS));
-  const creatorVault = pda([enc("creator-vault"), c.creator.toBytes()], pump);
-  const userVol = pda([enc("user_volume_accumulator"), user.toBytes()], pump);
-  const k = (pubkey, isWritable=false, isSigner=false) => ({pubkey, isWritable, isSigner});
-  const keys = [
-    k(pda([enc("global")], pump)),
-    k(m), k(wsol), k(bp), k(tp), k(pk(ATA_ID)),
-    k(feeRec, true), k(ataOf(feeRec, wsol, tp), true),
-    k(buyback, true), k(ataOf(buyback, wsol, tp), true),
-    k(c.address, true), k(ataOf(c.address, m, bp), true), k(ataOf(c.address, wsol, tp), true),
-    k(user, true, true), k(ataOf(user, m, bp), true), k(ataOf(user, wsol, tp), true),
-    k(creatorVault, true), k(ataOf(creatorVault, wsol, tp), true),
-    k(pda([enc("sharing-config"), m.toBytes()], pfee)),
-  ];
-  if(isBuy) keys.push(k(pda([enc("global_volume_accumulator")], pump)));
-  keys.push(
-    k(userVol, true), k(ataOf(userVol, wsol, tp), true),
-    k(pda([enc("fee_config"), pump.toBytes()], pfee)), k(pfee),
-    k(pk(SYS_ID)), k(pda([enc("__event_authority")], pump)), k(pump),
-  );
-  return keys;
-}
-function createAtaIdempotent(payer, owner, mint, tokenProg){
-  const W = W3();
-  return new W.TransactionInstruction({ programId: pk(ATA_ID), data: Uint8Array.of(1), keys: [
-    {pubkey: payer, isSigner: true, isWritable: true},
-    {pubkey: ataOf(owner, mint, tokenProg), isSigner: false, isWritable: true},
-    {pubkey: owner, isSigner: false, isWritable: false},
-    {pubkey: mint, isSigner: false, isWritable: false},
-    {pubkey: pk(SYS_ID), isSigner: false, isWritable: false},
-    {pubkey: tokenProg, isSigner: false, isWritable: false},
-  ]});
-}
-function computeIxs(){
-  const W = W3(), units = 300000;
-  const micro = Math.floor(cfg.prio * 1e6 / units);
-  return [W.ComputeBudgetProgram.setComputeUnitLimit({units}), W.ComputeBudgetProgram.setComputeUnitPrice({microLamports: micro})];
-}
-async function buildTx(ixs, user){
-  const W = W3();
-  const {value} = await rpc("getLatestBlockhash", [{commitment:"confirmed"}]);
-  const msg = new W.TransactionMessage({payerKey: user, recentBlockhash: value.blockhash, instructions: ixs}).compileToV0Message();
-  return new W.VersionedTransaction(msg);
-}
-
-// Plan a trade: everything the user sees before approving.
-async function planTrade(){
-  const c = cur.curve;
-  const raw = await rawAmount();
-  if(!raw || !c) return null;
-  const slip = BigInt(cfg.slip);
-  if(side === "buy"){
-    const fee = bulledFee(raw);
-    const spend = raw - fee;
-    const out = quoteBuy(c, spend);
-    if(out === 0n) return null;
-    return { side, total: raw, fee, spend, out, minOut: out * (10000n - slip) / 10000n };
-  } else {
-    const solOut = quoteSell(c, raw);
-    const minSol = solOut * (10000n - slip) / 10000n;
-    const fee = bulledFee(minSol);
-    return { side, tokens: raw, solOut, minSol, fee, youGet: solOut - fee };
-  }
-}
-async function executePlan(p){
-  const W = W3(), user = pk(wallet), c = cur.curve, m = pk(cur.mint), feeWallet = pk(FEE_WALLET);
-  const ixs = computeIxs();
-  if(p.side === "buy"){
-    ixs.push(createAtaIdempotent(user, user, m, pk(c.baseProgram)));
-    ixs.push(W.SystemProgram.transfer({fromPubkey: user, toPubkey: feeWallet, lamports: p.fee}));
-    ixs.push(new W.TransactionInstruction({programId: pk(PUMP_ID), keys: curveKeys(c, cur.mint, user, true), data: ixData(DISC.buyExactIn, p.spend, p.minOut)}));
-  } else {
-    ixs.push(new W.TransactionInstruction({programId: pk(PUMP_ID), keys: curveKeys(c, cur.mint, user, false), data: ixData(DISC.sell, p.tokens, p.minSol)}));
-    ixs.push(W.SystemProgram.transfer({fromPubkey: user, toPubkey: feeWallet, lamports: p.fee}));
-  }
-  const tx = await buildTx(ixs, user);
-  const {signature} = await provider().signAndSendTransaction(tx);
-  return signature;
-}
-
 function renderTrade(){
   const box = $("tradeBox"); if(!box || !cur) return;
-  const sym = cur.pair?.baseToken?.symbol || "token";
-  const c = cur.curve;
-  if(cur.curveState === "loading"){ box.innerHTML = `<div class="quote" style="margin-top:12px"><div><span>Checking the bonding curve…</span></div></div>`; return; }
-  if(!FEE_WALLET){ box.innerHTML = `<div class="note warn" style="margin-top:12px">Trading is switched off until the owner's fee wallet is set.</div>`; return; }
-  if(cur.curveState === "rpcfail"){ box.innerHTML = `<div class="note warn" style="margin-top:12px">Couldn't reach Solana. Add a free RPC URL (Helius or QuickNode) in <a href="#" onclick="closeSheet();show('settings');return false;">Settings</a>.</div>`; return; }
-  if(!curveTradable(c)){
-    const why = c?.complete ? "This coin has graduated from the pump.fun curve." : c && !c.solPaired ? "This coin trades against USDC, which Bulled doesn't support yet." : "This coin isn't on a pump.fun bonding curve.";
-    box.innerHTML = `<div class="note" style="margin-top:12px">${why} Bulled trades coins while they're on the curve. You can still trade this one in your Phantom wallet's Swap tab.</div>`;
+  const prevEl = $("amt"), prev = prevEl && prevEl.value ? {v: prevEl.value, raw: prevEl.dataset.raw, side: box.dataset.side, result: $("quoteBox")?.querySelector(".note") ? $("quoteBox").innerHTML : null} : null;
+  box.dataset.side = side;
+  const v = cur.venue, sym = cur.pair?.baseToken?.symbol || "token";
+  if(cur.state === "loading"){ box.innerHTML = `<div class="quote"><div><span>Finding the best way to trade…</span></div></div>`; return; }
+  if(cur.state === "rpcfail"){ box.innerHTML = `<div class="note warn" style="margin-top:12px">Couldn't reach Solana. Check your connection and try again.</div>`; return; }
+  if(!tradable(v)){
+    const why = v?.reason === "usdc" ? "This coin trades against USDC, which Bulled doesn't support yet." : "Bulled trades pump.fun coins, and this one isn't from pump.fun.";
+    box.innerHTML = `<div class="note" style="margin-top:12px">${why} You can still trade it in your Phantom wallet's Swap tab.</div>`;
     return;
   }
-  let warn = cur.risk === "bad" ? `<div class="note warn" style="margin-top:12px">⚠️ RugCheck flags this coin as high risk. You could lose everything you put in.</div>` : "";
-  const progress = c ? Math.min(100, Number(10000n - (c.rT * 10000n) / 793100000000000n) / 100) : null;
-  const bar = progress != null && progress >= 0 ? `<div class="quote" style="margin-top:12px"><div><span>Bonding curve progress</span><b>${progress.toFixed(1)}%</b></div><div style="height:6px;background:var(--field);border-radius:3px;overflow:hidden;padding:0"><div style="width:${progress}%;background:var(--gold);height:100%;padding:0"></div></div></div>` : "";
-  if(side === "buy"){
-    box.innerHTML = `${warn}${bar}<label>Amount (SOL)${solBal!=null?` · balance ${solBal.toFixed(4)}`:""}</label>
+  const warn = cur.safety?.level === "bad" ? `<div class="note warn" style="margin-top:12px">⚠️ Bulled Safety flags this coin as high risk. You could lose everything you put in.</div>` : "";
+  const where = v.kind === "curve"
+    ? `<div class="quote"><div><span>🟡 On the pump.fun curve</span><b>${curveProgress(v).toFixed(1)}% to graduation</b></div><div class="progress" style="padding:0"><div style="width:${curveProgress(v)}%;padding:0"></div></div></div>`
+    : `<div class="quote"><div><span>🎓 Graduated · trading on PumpSwap</span><b>live pool</b></div></div>`;
+  const has = holding && holding.raw > 0n;
+  box.innerHTML = side === "buy"
+    ? `${warn}${where}<label>Amount (SOL)${solBal!=null?` · balance ${solBal.toFixed(4)}`:""}</label>
       <input id="amt" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.1">
-      <div class="presets">${[0.05,0.1,0.25,0.5,1].map(v=>`<button onclick="setAmt(${v})">${v}</button>`).join("")}</div>
+      <div class="presets">${[0.05,0.1,0.25,0.5,1].map(x=>`<button onclick="setAmt(${x})">${x}</button>`).join("")}</div>
       <div id="quoteBox"></div>
-      <button class="btn full" id="goBtn" style="margin-top:12px;background:var(--up)" onclick="doTrade()">${wallet?`Buy ${esc(sym)}`:"Connect Phantom to buy"}</button>`;
-  } else {
-    const has = holding && holding.ui > 0;
-    box.innerHTML = `${warn}${bar}<label>Amount (${esc(sym)})${has?` · you hold ${holding.ui.toLocaleString(undefined,{maximumFractionDigits:2})}`:""}</label>
+      <button class="btn full buy" id="goBtn" style="margin-top:12px" onclick="doTrade()">${wallet?`Buy ${esc(sym)}`:"Connect Phantom to buy"}</button>`
+    : `${warn}${where}<label>Amount (${esc(sym)})${has?` · you hold ${fmtTok(holding.raw, holding.decimals)}`:""}</label>
       <input id="amt" type="number" inputmode="decimal" min="0" placeholder="${has?"0":"You don't hold this coin"}">
-      <div class="presets">${[25,50,75,100].map(v=>`<button onclick="setPct(${v})" ${has?"":"disabled"}>${v}%</button>`).join("")}</div>
+      <div class="presets">${[25,50,75,100].map(x=>`<button onclick="setPct(${x})" ${has?"":"disabled"}>${x}%</button>`).join("")}</div>
       <div id="quoteBox"></div>
       <button class="btn full sell" id="goBtn" style="margin-top:12px" onclick="doTrade()">${wallet?`Sell ${esc(sym)}`:"Connect Phantom to sell"}</button>`;
-  }
-  $("amt").addEventListener("input", () => { delete $("amt").dataset.raw; clearTimeout(window._qt); window._qt = setTimeout(getQuote, 300); });
+  $("amt").addEventListener("input", () => { delete $("amt").dataset.raw; clearTimeout(window._qt); window._qt = setTimeout(showQuote, 300); });
+  if(prev && prev.side === side){ $("amt").value = prev.v; if(prev.raw) $("amt").dataset.raw = prev.raw; if(prev.result) $("quoteBox").innerHTML = prev.result; else showQuote(); }
 }
-function setAmt(v){ $("amt").value = v; getQuote(); }
-function setPct(p){
+function setAmt(x){ $("amt").value = x; showQuote(); }
+function setPct(x){
   if(!holding) return;
-  const raw = p === 100 ? holding.raw : holding.raw * BigInt(p) / 100n;
-  $("amt").value = (Number(raw) / 10**holding.decimals).toString();
-  $("amt").dataset.raw = raw.toString();
-  getQuote();
+  const raw = x === 100 ? holding.raw : holding.raw * BigInt(x) / 100n;
+  $("amt").value = (Number(raw) / 10**holding.decimals).toString(); $("amt").dataset.raw = raw.toString();
+  showQuote();
 }
-async function rawAmount(){
+function rawAmount(){
   const el = $("amt"); if(!el) return null;
-  const v = Number(el.value);
-  if(!(v > 0)) return null;
-  if(side === "buy") return BigInt(Math.floor(v * 1e9));
+  const x = Number(el.value); if(!(x > 0)) return null;
+  if(side === "buy") return BigInt(Math.floor(x * 1e9));
   if(el.dataset.raw) return BigInt(el.dataset.raw);
-  const d = cur.curve?.decimals ?? 6;
-  return BigInt(Math.floor(v * 10**d));
+  return BigInt(Math.floor(x * 10**(cur.venue?.decimals ?? 6)));
 }
-const fmtSol = l => (Number(l)/1e9).toLocaleString(undefined,{maximumFractionDigits:5});
-const fmtTok = (t, d) => (Number(t)/10**d).toLocaleString(undefined,{maximumFractionDigits:2});
-async function getQuote(){
-  const qb = $("quoteBox"); if(!qb || !cur?.curve) return null;
-  const p = await planTrade();
+function showQuote(){
+  const qb = $("quoteBox"); if(!qb || !tradable(cur?.venue)) return null;
+  const v = cur.venue, p = planTrade(v, side, rawAmount());
   if(!p){ qb.innerHTML = ""; return null; }
-  const sym = cur.pair?.baseToken?.symbol || "", d = cur.curve.decimals;
+  const sym = cur.pair?.baseToken?.symbol || "", d = v.decimals;
   if(p.side === "sell" && (!holding || p.tokens > holding.raw)){
     qb.innerHTML = `<div class="note warn" style="margin-top:12px">You only hold ${holding ? fmtTok(holding.raw, holding.decimals) : "0"} ${esc(sym)}. Tap 100% to sell it all.</div>`;
     return null;
   }
-  qb.innerHTML = p.side === "buy" ? `<div class="quote">
-      <div><span>You receive (est.)</span><b>${fmtTok(p.out,d)} ${esc(sym)}</b></div>
-      <div><span>Bulled fee (0.45%)</span><b>${fmtSol(p.fee)} SOL</b></div>
-      <div><span>pump.fun fee (1.25%)</span><b>included</b></div>
-      </div>`
-    : `<div class="quote">
-      <div><span>You receive (est.)</span><b>${fmtSol(p.youGet)} SOL</b></div>
-      <div><span>Bulled fee (0.45%)</span><b>${fmtSol(p.fee)} SOL</b></div>
-      <div><span>pump.fun fee (1.25%)</span><b>included</b></div>
-      </div>`;
+  const usdv = l => SOL_USD ? ` <span style="color:var(--sub);font-weight:500">(${usd(Number(l)/1e9*SOL_USD)})</span>` : "";
+  qb.innerHTML = `<div class="quote">
+    <div><span>You receive (est.)</span><b>${p.side==="buy" ? `${fmtTok(p.out,d)} ${esc(sym)}` : `${fmtSol(p.youGet)} SOL${usdv(p.youGet)}`}</b></div>
+    <div><span>Bulled fee (0.45%)</span><b>${fmtSol(p.fee)} SOL</b></div>
+    <div><span>pump.fun fee (${venueFeePct(v)})</span><b>included</b></div></div>`;
   return p;
 }
-
 async function doTrade(){
   if(!wallet){ connect(); return; }
-  if(!W3()){ toast("Trading library didn't load. Reload the page."); return; }
-  if(!FEE_WALLET || !curveTradable(cur?.curve)) return;
-  if(side === "buy" && cur.risk === "bad" && !confirm("RugCheck flags this coin as HIGH RISK. You could lose everything. Buy anyway?")) return;
-  const btn = $("goBtn"); const label = btn.innerHTML;
-  btn.disabled = true; btn.innerHTML = `<span class="spin"></span>Preparing…`;
+  if(!tradable(cur?.venue)) return;
+  if(side === "buy" && cur.safety?.level === "bad" && !confirm("Bulled Safety flags this coin as HIGH RISK. You could lose everything. Buy anyway?")) return;
+  const btn = $("goBtn"), label = btn.innerHTML, mint = cur.mint, stage = t => { if(document.body.contains(btn)) btn.innerHTML = `<span class="spin"></span>${t}`; };
+  btn.disabled = true; stage("Preparing…");
   try{
-    cur.curve = await loadCurve(cur.mint);           // fresh reserves right before trading
-    if(!curveTradable(cur.curve)) throw new Error("This coin just graduated — trade it in Phantom's Swap tab");
-    const p = await planTrade();
+    const v = await loadVenue(mint);                   // fresh reserves right before trading
+    if(!tradable(v)) throw new Error("This coin can't be traded right now");
+    cur.venue = v;
+    const p = planTrade(v, side, rawAmount());
     if(!p) throw new Error("Enter an amount first");
-    if(p.side === "buy" && solBal != null && Number(p.total)/1e9 + 0.01 > solBal) throw new Error("Not enough SOL (keep ~0.01 SOL for network fees)");
-    if(p.side === "sell" && (!holding || p.tokens > holding.raw)) throw new Error("You don't hold enough of this coin");
-    btn.innerHTML = `<span class="spin"></span>Approve in Phantom…`;
-    const sig = await executePlan(p);
-    btn.innerHTML = `<span class="spin"></span>Confirming…`;
-    const ok = await waitConfirm(sig);
-    const mint = cur.mint;
-    await Promise.all([refreshBalance(), loadHolding(mint), loadCurve(mint).then(c => { if(cur && cur.mint === mint) cur.curve = c; }).catch(()=>{})]);
-    if(cur && cur.mint === mint){ renderTrade(); showResult(sig, ok); }
-    else toast(ok===false ? "Trade failed" : "Trade confirmed");
-  }catch(e){
-    const m = String(e?.message || e);
-    if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in Phantom");
-    else toast(m.length > 110 ? "Trade didn't go through. Try again." : m, 4000);
-  }finally{
-    if(document.body.contains(btn)){ btn.disabled = false; btn.innerHTML = label; }
-  }
+    if(p.side === "sell"){ holding = await holdingOf(mint); if(!holding || p.tokens > holding.raw) throw new Error("You don't hold enough of this coin"); }
+    const {signature, ok} = await runTrade(v, p, stage);
+    if(cur?.mint === mint){
+      holding = await holdingOf(mint).catch(()=>holding);
+      cur.venue = await loadVenue(mint).catch(()=>cur.venue);
+      renderTrade(); showResult(signature, ok);
+    } else toast(ok===false ? "Trade failed" : "Trade confirmed");
+  }catch(e){ tradeError(e); }
+  finally{ if(document.body.contains(btn)){ btn.disabled = false; btn.innerHTML = label; } }
 }
-async function waitConfirm(sig){
-  for(let i=0;i<30;i++){
-    await new Promise(r=>setTimeout(r, 1500));
-    try{
-      const r = await rpc("getSignatureStatuses", [[sig], {searchTransactionHistory:false}]);
-      const s = r.value[0];
-      if(s?.err) return false;
-      if(s && (s.confirmationStatus==="confirmed" || s.confirmationStatus==="finalized")) return true;
-    }catch{ return null; }
-  }
-  return null;
+function tradeError(e){
+  const m = String(e?.message || e);
+  if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in Phantom");
+  else toast(m.length > 110 ? "Trade didn't go through. Try again." : m, 4000);
 }
 function showResult(sig, ok){
   const qb = $("quoteBox");
-  const txt = ok===true ? "✅ Trade confirmed" : ok===false ? "❌ Price moved too fast, so the trade was cancelled and no coins or SOL were swapped (only a tiny network fee). Try again, or raise Price protection in Settings." : "📤 Trade sent — check Solscan for confirmation";
-  if(qb) qb.innerHTML = `<div class="note ${ok===false?"warn":""}" style="margin-top:12px">${txt}<br><a href="https://solscan.io/tx/${esc(sig)}" target="_blank" rel="noopener">View transaction ↗</a></div>`;
-  toast(ok===true ? "Trade confirmed" : ok===false ? "Trade failed" : "Trade sent");
+  const txt = ok===true ? "✅ Trade confirmed" : ok===false ? "Price moved too fast, so the trade was cancelled and nothing was swapped (only a tiny network fee). Try again, or raise Price protection in Settings." : "📤 Trade sent. Check Solscan for confirmation.";
+  if(qb) qb.innerHTML = `<div class="note ${ok===false?"warn":ok===true?"good":""}" style="margin-top:12px">${txt}<br><a href="https://solscan.io/tx/${esc(sig)}" target="_blank" rel="noopener">View transaction ↗</a></div>`;
+  toast(ok===true ? "Trade confirmed" : ok===false ? "Trade cancelled: price moved" : "Trade sent");
 }
 
-// ---------- holdings ----------
+// ================= Quick buy =================
+async function quickBuy(mint, btn){
+  if(!wallet){ connect(); return; }
+  const label = btn.innerHTML; btn.disabled = true; btn.innerHTML = "…";
+  try{
+    const v = await loadVenue(mint);
+    if(!tradable(v)) throw new Error("This coin can't be traded in Bulled");
+    const r = riskCache[mint] || await rugcheck(mint).then(x => (riskCache[mint] = x)).catch(()=>null);
+    if(r?.level === "bad" && !confirm("RugCheck flags this coin as HIGH RISK. You could lose everything. Buy anyway?")) return;
+    const p = planTrade(v, "buy", BigInt(Math.round(cfg.quick * 1e9)));
+    if(!p) throw new Error("Couldn't price this coin");
+    toast(`⚡ Buying ${cfg.quick} SOL of ${pairCache[mint]?.baseToken?.symbol || "coin"}… approve in Phantom`);
+    const {ok} = await runTrade(v, p);
+    toast(ok===true ? "✅ Bought!" : ok===false ? "Price moved too fast. Nothing was swapped." : "📤 Trade sent", 3500);
+  }catch(e){ tradeError(e); }
+  finally{ btn.disabled = false; btn.innerHTML = label; }
+}
+
+// ================= Holdings with P&L =================
 async function renderHoldings(){
   const el = $("holdings");
-  if(!wallet){ el.innerHTML = `<div class="empty">Connect Phantom to see your coins.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect Phantom</button></div>`; return; }
-  el.innerHTML = `<div class="empty">Loading your wallet…</div>`;
+  if(!wallet){ el.innerHTML = `<h2 class="page">Holdings</h2><div class="empty">Connect Phantom to see your coins and profit.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect Phantom</button></div>`; return; }
+  if(!el.innerHTML.includes("hero")) el.innerHTML = `<h2 class="page">Holdings</h2><div class="empty">Loading your wallet…</div>`;
   try{
     await refreshBalance();
-    const toks = await tokenAccounts();
-    const by = await pairsFor(toks.map(t=>t.mint));
-    const rows = toks.map(t => ({...t, pair: by[t.mint], val: t.ui * Number(by[t.mint]?.priceUsd || 0)})).sort((a,b)=>b.val-a.val);
-    const solPx = await solPrice();
-    const total = rows.reduce((s,r)=>s+r.val,0) + (solBal||0)*solPx;
-    el.innerHTML = `<div class="bal"><div class="l">Wallet value</div><div class="big">${solPx?usd(total):"—"}</div><div class="s">${(solBal??0).toFixed(4)} SOL${solPx?" · "+usd((solBal||0)*solPx):""}</div></div>
-      ${rows.length ? rows.map(r => {
-        const p = r.pair, sym = p?.baseToken?.symbol || short(r.mint);
-        return `<div class="row" onclick="openToken('${esc(r.mint)}')">${p?.info?.imageUrl?`<img class="av" src="${esc(p.info.imageUrl)}" alt="">`:`<div class="av">${esc(sym[0])}</div>`}
+    const toks = await tokenAccounts(), by = await pairsFor(toks.map(t=>t.mint)), l = ledger();
+    const rows = toks.map(t => {
+      const p = by[t.mint], val = t.ui * Number(p?.priceUsd || 0), e = l[t.mint];
+      const costUsd = e && e.tokens > 0 && SOL_USD ? e.cost / 1e9 * SOL_USD * Math.min(1, Number(t.raw) / e.tokens) : null;
+      return {...t, pair:p, val, pnl: costUsd ? val - costUsd : null, pnlPct: costUsd ? (val - costUsd) / costUsd * 100 : null};
+    }).sort((a,b)=>b.val-a.val);
+    const total = rows.reduce((s,r)=>s+r.val,0) + (solBal||0)*SOL_USD;
+    const tracked = rows.filter(r => r.pnl != null), open = tracked.reduce((s,r)=>s+r.pnl,0);
+    const realized = Object.values(l).reduce((s,e)=>s+(e.realized||0),0) / 1e9 * SOL_USD;
+    el.innerHTML = `<h2 class="page">Holdings</h2>
+      <div class="hero"><div class="l">Wallet value</div><div class="big">${SOL_USD?usd(total):"—"}</div>
+        <div class="s">${(solBal??0).toFixed(4)} SOL${SOL_USD?" · "+usd((solBal||0)*SOL_USD):""}</div>
+        ${tracked.length || realized ? `<div class="s" style="margin-top:8px">Open P&L <b class="${open>=0?"up":"down"}">${open>=0?"+":""}${usd(open)}</b> · Realized <b class="${realized>=0?"up":"down"}">${realized>=0?"+":""}${usd(realized)}</b></div>` : ""}</div>
+      ${rows.length ? rows.map(r => { const p = r.pair, sym = p?.baseToken?.symbol || short(r.mint);
+        return `<div class="row" onclick="openToken('${esc(r.mint)}')"><div class="av-wrap">${p?.info?.imageUrl?`<img class="av" src="${esc(p.info.imageUrl)}" alt="">`:`<div class="av">${esc(sym[0])}</div>`}</div>
           <div class="grow"><div class="nm">${esc(p?.baseToken?.name || "Unknown")}<span>${esc(sym)}</span></div>
-          <div class="meta">${r.ui.toLocaleString(undefined,{maximumFractionDigits:2})} ${esc(sym)}</div></div>
-          <div class="px"><b>${p?usd(r.val):"—"}</b>${pct(p?.priceChange?.h24)}</div></div>`; }).join("") : `<div class="empty">No coins yet. Find one in Market and buy it.</div>`}`;
-  }catch(e){
-    el.innerHTML = `<div class="note warn">Couldn't read your wallet. The free public Solana RPC often blocks browsers — add a free RPC URL (Helius or QuickNode) in <a href="#" onclick="show('settings');return false;">Settings</a>.</div>`;
-  }
-}
-async function solPrice(){
-  try{
-    const arr = await getJSON(`${DEX}/tokens/v1/solana/${SOL_MINT}`);
-    const ps = (arr||[]).filter(p => p.baseToken?.address===SOL_MINT && /^(USDC|USDT)$/.test(p.quoteToken?.symbol||""));
-    ps.sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0));
-    return Number(ps[0]?.priceUsd || 0);
-  }catch{ return 0; }
+          <div class="meta">${fmtTok(r.raw, r.decimals)} ${esc(sym)}</div></div>
+          <div class="px"><b>${p?usd(r.val):"—"}</b>${r.pnl!=null?`<div class="pnl ${r.pnl>=0?"up":"down"}">${r.pnl>=0?"+":""}${usd(r.pnl)} (${r.pnlPct>=0?"+":""}${r.pnlPct.toFixed(0)}%)</div>`:pct(p?.priceChange?.h24)}</div></div>`; }).join("")
+        : `<div class="empty">No coins yet. Find one in Market and buy it.</div>`}
+      <p class="fine">Profit and loss is tracked for trades made in Bulled on this device.</p>`;
+  }catch{ el.innerHTML = `<h2 class="page">Holdings</h2><div class="note warn">Couldn't read your wallet right now. Pull down to refresh or try again in a moment.</div>`; }
 }
 
-// ---------- nav & settings ----------
-function show(v){
-  ["market","holdings","settings"].forEach(x => $("view-"+x).classList.toggle("hide", x!==v));
-  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view===v));
-  if(v==="holdings") renderHoldings();
-  if(v==="settings"){ $("set-rpc").value = ls("rpc",""); $("set-slip").value = String(cfg.slip); $("set-prio").value = String(cfg.prio); }
-  window.scrollTo(0,0);
+// ================= Earn (referrals) =================
+function siteLink(){ return location.origin + location.pathname.replace(/index\.html$/, ""); }
+function renderEarn(){
+  const el = $("earn"), share = REF_SHARE_BPS / 100, ref = getRef();
+  const link = wallet ? `${siteLink()}?ref=${wallet}` : null;
+  el.innerHTML = `<h2 class="page">Earn SOL</h2>
+    <div class="hero"><div class="l">Refer friends</div><div class="big">${share}% of fees</div>
+      <div class="s">Earn ${share}% of Bulled's fee on every trade your friends make, paid instantly in SOL to your wallet with each trade.</div></div>
+    ${link ? `<div class="section">Your link</div><div class="linkbox"><span class="grow">${esc(link)}</span></div>
+      <div style="display:flex;gap:8px"><button class="btn full" onclick="shareLink()">Share link</button><button class="btn ghost" style="padding:15px 16px" onclick="copyRef()">Copy</button></div>
+      <div class="links"><a href="https://solscan.io/account/${esc(wallet)}#transfers" target="_blank" rel="noopener">See your earnings on Solscan ↗</a></div>`
+      : `<div class="empty">Connect Phantom to get your referral link.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect Phantom</button></div>`}
+    <div class="section">How it works</div>
+    <div class="inst-step"><div class="n">1</div><div>Share your link on X, Telegram or with friends</div></div>
+    <div class="inst-step"><div class="n">2</div><div>They trade on Bulled. Their fee stays the same 0.45%</div></div>
+    <div class="inst-step"><div class="n">3</div><div>Your ${share}% lands in your wallet in the same transaction as their trade</div></div>
+    ${ref ? `<p class="fine">You joined through ${short(ref)}'s link.</p>` : ""}
+    <p class="fine">Your wallet needs at least 0.001 SOL for payouts to arrive (a Solana rule for tiny payments).</p>`;
 }
-document.querySelectorAll(".nav button").forEach(b => b.onclick = () => show(b.dataset.view));
-function saveSettings(){
-  lsSet("rpc", $("set-rpc").value.trim());
-  lsSet("slip", $("set-slip").value);
-  lsSet("prio", $("set-prio").value);
-  toast("Settings saved"); refreshBalance();
+function copyRef(){ navigator.clipboard?.writeText(`${siteLink()}?ref=${wallet}`).then(()=>toast("Referral link copied"), ()=>toast("Couldn't copy")); }
+function shareLink(){
+  const url = `${siteLink()}?ref=${wallet}`;
+  if(navigator.share) navigator.share({title:"Bulled", text:"Trade pump.fun coins with rug warnings built in 🐂", url}).catch(()=>{});
+  else copyRef();
 }
 
-// ---------- app install ----------
+// ================= App install =================
 let installPrompt = null;
 window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); installPrompt = e; renderAppCard(); });
-window.addEventListener("appinstalled", () => { installPrompt = null; lsSet("installed","1"); renderAppCard(); toast("Bulled installed 🎉"); });
+window.addEventListener("appinstalled", () => { installPrompt = null; renderAppCard(); toast("Bulled installed 🎉"); });
 function isStandalone(){ return window.matchMedia?.("(display-mode: standalone)").matches || navigator.standalone === true; }
 function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1); }
 function isAndroid(){ return /android/i.test(navigator.userAgent); }
-function inWalletBrowser(){ return isMobile() && !!provider(); }   // Phantom's in-app browser can't install apps
-function siteLink(){ return location.origin + location.pathname.replace(/index\.html$/, ""); }
+function inWalletBrowser(){ return isMobile() && !!provider(); }
 function renderAppCard(){
   const st = $("appStatus"), btn = $("appBtn");
   if(st && btn){
@@ -797,12 +1043,10 @@ function renderAppCard(){
 }
 function step(n, html){ return `<div class="inst-step"><div class="n">${n}</div><div>${html}</div></div>`; }
 async function openInstall(){
-  const head = `<button class="x" onclick="closeSheet()">×</button>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><img src="icons/icon-180.png" alt="" style="width:56px;height:56px;border-radius:14px"><div><h2 style="margin:0">Get the Bulled app</h2><div class="meta">Free · installs in seconds · no App Store</div></div></div>`;
+  const head = `<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px"><img src="icons/icon-180.png" alt="" style="width:56px;height:56px;border-radius:14px"><div><h2 style="margin:0">Get the Bulled app</h2><div class="meta">Free · installs in seconds · no App Store</div></div></div>`;
   let body;
-  if(isStandalone()){
-    body = `<p style="font-size:14.5px;line-height:1.5">You're already using the Bulled app. 🎉</p>`;
-  } else if(installPrompt){
+  if(isStandalone()) body = `<p style="font-size:14.5px;line-height:1.5">You're already using the Bulled app. 🎉</p>`;
+  else if(installPrompt){
     installPrompt.prompt();
     const r = await installPrompt.userChoice.catch(()=>({}));
     installPrompt = null; renderAppCard();
@@ -830,16 +1074,59 @@ async function openInstall(){
 }
 function copyLink(){ navigator.clipboard?.writeText(siteLink()).then(()=>toast("Link copied. Now open " + (isIOS() ? "Safari" : "Chrome")), ()=>toast(siteLink(), 6000)); }
 
-// ---------- boot ----------
+// ================= Navigation, settings, live updates =================
+let view = "market";
+function show(v){
+  view = v;
+  ["market","holdings","earn","settings"].forEach(x => $("view-"+x).classList.toggle("hide", x!==v));
+  document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view===v));
+  rerenderView();
+  if(v==="settings"){ $("set-rpc").value = ls("rpc",""); $("set-slip").value = String(cfg.slip); $("set-prio").value = String(cfg.prio); $("set-quick").value = String(cfg.quick); }
+  window.scrollTo(0,0);
+}
+function rerenderView(){ if(view==="holdings") renderHoldings(); if(view==="earn") renderEarn(); if(view==="market" && rowsShown.length) renderRows(rowsShown); }
+document.querySelectorAll(".nav button").forEach(b => b.onclick = () => show(b.dataset.view));
+function saveSettings(){
+  lsSet("rpc", $("set-rpc").value.trim()); lsSet("slip", $("set-slip").value); lsSet("prio", $("set-prio").value); lsSet("quick", $("set-quick").value);
+  toast("Settings saved"); refreshBalance();
+}
+async function loadSolPrice(){
+  try{
+    const arr = await getJSON(`${DEX}/tokens/v1/solana/${SOL_MINT}`);
+    const ps = (arr||[]).filter(p => p.baseToken?.address===SOL_MINT && /^(USDC|USDT)$/.test(p.quoteToken?.symbol||"")).sort((a,b)=>(b.liquidity?.usd||0)-(a.liquidity?.usd||0));
+    SOL_USD = Number(ps[0]?.priceUsd || SOL_USD);
+  }catch{}
+}
+// Live: refresh the list every 20s and the open coin every 8s while the app is visible
+setInterval(() => { if(document.hidden) return; if(view==="market" && !searching && !$("sheetBg").classList.contains("open")) loadList(true); }, 20000);
+setInterval(async () => {
+  if(document.hidden || !cur?.mint || !$("sheetBg").classList.contains("open")) return;
+  const mint = cur.mint;
+  try{
+    const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`));
+    if(cur?.mint !== mint || !by[mint]) return;
+    cur.pair = by[mint];
+    const tp = $("tkPrice"), ts = $("tkStats");
+    if(tp) tp.innerHTML = `${priceFmt(cur.pair.priceUsd)} ${pct(cur.pair.priceChange?.h24)}`;
+    if(ts) ts.innerHTML = statsHTML(cur.pair);
+    const v = await loadVenue(mint).catch(()=>null);
+    if(v && cur?.mint === mint){ cur.venue = v; if($("amt")?.value) showQuote(); }
+  }catch{}
+}, 8000);
+setInterval(loadSolPrice, 60000);
+
+// ================= Boot =================
+$("safeBtn").classList.toggle("on", ls("safe","") === "on");
 renderWallet();
 renderAppCard();
+loadSolPrice();
 loadList();
 if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 setTimeout(async () => {
   const p = provider();
   if(p){
-    try{ const r = await p.connect({onlyIfTrusted:true}); wallet = r.publicKey.toString(); renderWallet(); refreshBalance(); }catch{}
-    p.on?.("accountChanged", pk => { wallet = pk ? pk.toString() : null; solBal = null; renderWallet(); refreshBalance(); });
+    try{ const r = await p.connect({onlyIfTrusted:true}); wallet = r.publicKey.toString(); renderWallet(); refreshBalance(); rerenderView(); }catch{}
+    p.on?.("accountChanged", k => { wallet = k ? k.toString() : null; solBal = null; renderWallet(); refreshBalance(); rerenderView(); });
   }
 }, 300);
 </script>
