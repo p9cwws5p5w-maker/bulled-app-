@@ -164,7 +164,7 @@ function ls(k, d){ try{ const v = localStorage.getItem("bulled_"+k); return v===
 function lsSet(k, v){ try{ localStorage.setItem("bulled_"+k, v); }catch{} }
 const cfg = {
   get rpc(){ return ls("rpc","") || DEFAULT_RPC; },
-  get slip(){ return Number(ls("slip","300")); },
+  get slip(){ return Number(ls("slip","1000")); },
   get prio(){ return Number(ls("prio","200000")); },
 };
 
