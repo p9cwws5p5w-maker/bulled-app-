@@ -132,6 +132,11 @@ label{display:block;font-size:12.5px;color:var(--sub);margin:12px 0 6px;line-hei
 .spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.25);border-top-color:#000;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:6px}
 @keyframes sp{to{transform:rotate(360deg)}}
 .hide{display:none!important}
+.row.fresh{animation:fresh 1.4s ease-out}
+@keyframes fresh{0%{background:#1d1707;border-color:var(--gold)}}
+.age{color:var(--gold);font-weight:800}
+.mini-prog{height:3px;background:var(--field);border-radius:2px;overflow:hidden;margin-top:5px;width:64px;margin-left:auto}
+.mini-prog div{height:100%;background:var(--gold)}
 .chart-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:12px 0 8px}
 .tf{display:flex;gap:3px;background:var(--field);border:1px solid var(--border);border-radius:10px;padding:3px}
 .tf button{background:none;border:0;color:var(--sub);font-weight:800;font-size:12px;padding:6px 9px;border-radius:7px;cursor:pointer}
@@ -169,7 +174,8 @@ h2.page{margin:6px 0 12px;font-size:22px}
     <div id="appCard"></div>
     <div class="search"><input id="q" placeholder="Search coin or paste a mint address" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
     <div class="tabs" id="feedTabs">
-      <div class="tab on" data-feed="hot">🔥 Hot</div>
+      <div class="tab" data-feed="live">⚡ Live</div>
+      <div class="tab" data-feed="hot">🔥 Hot</div>
       <div class="tab" data-feed="new">🌱 New</div>
       <div class="tab" data-feed="grad">🎓 Graduating</div>
       <div class="tab" data-feed="promo">📣 Promoted</div>
@@ -601,7 +607,7 @@ function recordTrade(mint, p, before, after){
 }
 
 // ================= Market feeds =================
-let feed = ls("feed","hot"), pairCache = {}, gtPoolMap = {}, rowsShown = [], searching = false;
+let feed = ls("feed","live"), pairCache = {}, gtPoolMap = {}, rowsShown = [], searching = false;
 function bestPairs(pairs){
   const by = {};
   for(const p of pairs || []){
@@ -643,6 +649,11 @@ function gtRows(j){
 }
 async function gt(path){ return getJSON(`${GT}${path}`, {headers:{Accept:"application/json;version=20230302"}}); }
 async function fetchFeed(kind){
+  if(kind === "live"){
+    startLaunches();
+    const seed = await gt("/new_pools?include=base_token").then(gtRows).catch(() => []);
+    return seed.filter(r => r.dexId === "pumpfun");
+  }
   if(kind === "hot"){
     const [a, b] = await Promise.all([gt("/trending_pools?include=base_token&duration=1h"), gt("/trending_pools?include=base_token&duration=1h&page=2").catch(()=>({data:[]}))]);
     return gtRows({data:[...a.data, ...b.data], included:[...(a.included||[]), ...(b.included||[])]});
@@ -664,6 +675,7 @@ async function fetchFeed(kind){
   return mints.map(m => by[m]).filter(Boolean);
 }
 const FEED_NOTES = {
+  live: `<div class="fine" style="margin:0 2px 10px">⚡ New pump.fun coins appear here the second they launch.</div>`,
   hot: "", new: "",
   grad: `<div class="note">Coins still on the pump.fun curve with the most market cap, closest to graduating.</div>`,
   promo: `<div class="note">📣 These coins <b>paid DexScreener</b> to be promoted. Paid promotion isn't a sign a coin is safe.</div>`,
@@ -672,8 +684,12 @@ async function loadList(silent){
   const el = $("list"); if(!silent) el.innerHTML = `<div class="empty">Loading coins…</div>`;
   $("feedNote").innerHTML = FEED_NOTES[feed] || "";
   try{
-    const rows = await fetchFeed(feed);
+    let rows = await fetchFeed(feed);
     if(searching) return;
+    if(feed === "live"){      // merge in launches that arrived while loading, newest first
+      const m = new Set(liveCoins.map(c => c.mint));
+      rows = [...liveCoins.map(liveToRow), ...rows.filter(r => !m.has(r.baseToken.address))];
+    }
     renderRows(rows);
   }catch{
     if(!silent) el.innerHTML = `<div class="empty">Couldn't load coins right now.<br><button class="btn ghost" style="margin-top:12px" onclick="loadList()">Try again</button></div>`;
@@ -681,6 +697,7 @@ async function loadList(silent){
 }
 function isPumpRow(p){ return p.dexId === "pumpfun" || p.dexId === "pumpswap" || /pump$/.test(p.baseToken?.address || ""); }
 function coinRow(p){
+  if(p.live) return liveRow(p);
   const img = p.info?.imageUrl, sym = p.baseToken.symbol || "?", mint = p.baseToken.address, r = riskCache[mint];
   const tag = p.dexId === "pumpfun" ? `<span class="tag curve">CURVE</span>` : p.dexId === "pumpswap" ? `<span class="tag grad">GRAD</span>` : "";
   return `<div class="row" data-mint="${esc(mint)}" onclick="openToken('${esc(mint)}')">
@@ -725,7 +742,9 @@ document.querySelectorAll("#feedTabs .tab").forEach(t => {
   t.classList.toggle("on", t.dataset.feed === feed);
   t.onclick = () => {
     document.querySelectorAll("#feedTabs .tab").forEach(x => x.classList.remove("on")); t.classList.add("on");
-    feed = t.dataset.feed; lsSet("feed", feed); $("q").value = ""; searching = false; loadList();
+    feed = t.dataset.feed; lsSet("feed", feed); $("q").value = ""; searching = false;
+    if(feed !== "live") stopLaunches();
+    loadList();
   };
 });
 
@@ -802,6 +821,7 @@ async function holdingOf(mint){ if(!wallet) return null; const t = await tokenAc
 
 async function openToken(mint){
   stopLive(); destroyChart(); lastShownPrice = null;
+  const lc = liveCoins.find(c => c.mint === mint); if(lc && !pairCache[mint]) pairCache[mint] = liveToRow(lc);
   cur = {mint, pair: pairCache[mint] || null, state:"loading"}; side = "buy"; holding = null;
   openSheetHTML(`<div class="empty">Loading…</div>`);
   if(!cur.pair){ try{ const by = bestPairs(await getJSON(`${DEX}/tokens/v1/solana/${mint}`)); if(cur?.mint === mint) cur.pair = by[mint] || null; }catch{} }
@@ -830,7 +850,7 @@ function renderToken(){
     <div class="tk-head">${img?`<img class="av" src="${esc(img)}" alt="">`:`<div class="av">${esc(sym[0])}</div>`}
       <div class="grow"><h2>${esc(name)} <span style="color:var(--sub);font-size:14px;font-weight:600">${esc(sym)}</span></h2>
       <div class="meta" style="cursor:pointer" onclick="navigator.clipboard?.writeText('${esc(mint)}').then(()=>toast('Mint address copied'))">${short(mint)} ⧉</div></div></div>
-    <div class="tk-price"><span id="tkPriceVal">${priceFmt(p?.priceUsd)}</span> <span id="tkChg">${pct(p?.priceChange?.h24)}</span><span class="livebadge" id="liveBadge"></span></div>
+    <div class="tk-price"><span id="tkPriceVal">${priceFmt(p?.priceUsd)}</span> <span id="tkChg">${isFinite(Number(p?.priceChange?.h24)) ? pct(p.priceChange.h24) : ""}</span><span class="livebadge" id="liveBadge"></span></div>
     <div class="grid" id="tkStats">${statsHTML(p)}</div>
     <div class="chart-bar">
       <div class="tf" id="tfBar">${Object.keys(TF).map(t=>`<button data-tf="${t}" class="${t===chartTf?"on":""}" onclick="setTf('${t}')">${t}</button>`).join("")}</div>
@@ -1111,6 +1131,7 @@ function copyLink(){ navigator.clipboard?.writeText(siteLink()).then(()=>toast("
 let view = "market";
 function show(v){
   view = v;
+  if(v !== "market") stopLaunches(); else if(feed === "live") startLaunches();
   ["market","holdings","earn","settings"].forEach(x => $("view-"+x).classList.toggle("hide", x!==v));
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view===v));
   rerenderView();
@@ -1156,43 +1177,48 @@ async function loadChart(){
   destroyChart();
   if(chartSrc === "dex" || !window.LightweightCharts){ box.innerHTML = dexIframe(mint); return; }
   box.innerHTML = `<div class="chart-msg">Loading chart…</div>`;
+  let list = [];
   try{
-    const pool = await gtPoolFor(mint); if(!pool) throw new Error("nopool");
-    const [tf, agg] = TF[chartTf];
-    const j = await gt(`/pools/${pool}/ohlcv/${tf}?aggregate=${agg}&limit=300&currency=usd&token=${mint}`);
-    if(token !== chartToken || cur?.mint !== mint) return;
-    const list = (j.data?.attributes?.ohlcv_list || []).slice().sort((x,y) => x[0]-y[0]);
-    if(!list.length) throw new Error("empty");
-    box.innerHTML = "";
-    chart = LightweightCharts.createChart(box, {
-      autoSize: true,
-      layout: { background: {type:"solid", color:"#131313"}, textColor:"#8e8e8e", fontFamily:"Inter, sans-serif" },
-      grid: { vertLines:{color:"#1c1c1c"}, horzLines:{color:"#1c1c1c"} },
-      rightPriceScale: { borderColor:"#222" },
-      timeScale: { borderColor:"#222", timeVisible:true, secondsVisible:false, rightOffset:4 },
-      crosshair: { mode: 0 },
-      localization: { priceFormatter: x => priceFmt(x).replace("$","") },
-    });
-    candleSeries = chart.addCandlestickSeries({ upColor:"#22c55e", downColor:"#f04444", borderVisible:false, wickUpColor:"#22c55e", wickDownColor:"#f04444",
-      priceFormat:{ type:"custom", minMove:1e-12, formatter: x => priceFmt(x).replace("$","") } });
-    volSeries = chart.addHistogramSeries({ priceFormat:{type:"volume"}, priceScaleId:"" });
-    volSeries.priceScale().applyOptions({ scaleMargins:{ top:0.82, bottom:0 } });
+    const pool = await gtPoolFor(mint);
+    if(pool){
+      const [tf, agg] = TF[chartTf];
+      const j = await gt(`/pools/${pool}/ohlcv/${tf}?aggregate=${agg}&limit=300&currency=usd&token=${mint}`);
+      list = (j.data?.attributes?.ohlcv_list || []).slice().sort((x,y) => x[0]-y[0]);
+    }
+  }catch{}
+  if(token !== chartToken || cur?.mint !== mint) return;
+  box.innerHTML = list.length ? "" : `<div class="chart-msg" style="z-index:2;pointer-events:none;align-items:flex-start;padding-top:14px">🆕 New coin: candles build live as people trade</div>`;
+  createChart(box);
+  if(list.length){
     const bars = list.map(r => ({ time:r[0], open:+r[1], high:+r[2], low:+r[3], close:+r[4] }));
     candleSeries.setData(bars);
     volSeries.setData(list.map(r => ({ time:r[0], value:+r[5], color: +r[4] >= +r[1] ? "rgba(34,197,94,.35)" : "rgba(240,68,68,.35)" })));
     lastBar = {...bars[bars.length-1]};
     chart.timeScale().fitContent();
-    if(lastShownPrice) chartTick(lastShownPrice);
-  }catch{
-    if(token !== chartToken || cur?.mint !== mint) return;
-    box.innerHTML = dexIframe(mint);          // no candle history yet (brand-new coin) → DexScreener's chart
   }
+  if(lastShownPrice) chartTick(lastShownPrice);
+}
+function createChart(box){
+  chart = LightweightCharts.createChart(box, {
+    autoSize: true,
+    layout: { background: {type:"solid", color:"#131313"}, textColor:"#8e8e8e", fontFamily:"Inter, sans-serif" },
+    grid: { vertLines:{color:"#1c1c1c"}, horzLines:{color:"#1c1c1c"} },
+    rightPriceScale: { borderColor:"#222" },
+    timeScale: { borderColor:"#222", timeVisible:true, secondsVisible:false, rightOffset:4 },
+    crosshair: { mode: 0 },
+    localization: { priceFormatter: x => priceFmt(x).replace("$","") },
+  });
+  candleSeries = chart.addCandlestickSeries({ upColor:"#22c55e", downColor:"#f04444", borderVisible:false, wickUpColor:"#22c55e", wickDownColor:"#f04444",
+    priceFormat:{ type:"custom", minMove:1e-12, formatter: x => priceFmt(x).replace("$","") } });
+  volSeries = chart.addHistogramSeries({ priceFormat:{type:"volume"}, priceScaleId:"" });
+  volSeries.priceScale().applyOptions({ scaleMargins:{ top:0.82, bottom:0 } });
 }
 // Moves the current candle with every live price, and starts a new candle when the time bucket rolls over
 function chartTick(price){
-  if(!candleSeries || !lastBar || !(price > 0)) return;
+  if(!candleSeries || !(price > 0)) return;
   const sec = TF[chartTf][2], t = Math.floor(Date.now()/1000/sec) * sec;
-  lastBar = t > lastBar.time
+  lastBar = !lastBar ? { time:t, open:price, high:price, low:price, close:price }
+    : t > lastBar.time
     ? { time:t, open:lastBar.close, high:Math.max(lastBar.close, price), low:Math.min(lastBar.close, price), close:price }
     : { ...lastBar, high:Math.max(lastBar.high, price), low:Math.min(lastBar.low, price), close:price };
   try{ candleSeries.update(lastBar); }catch{}
@@ -1205,13 +1231,14 @@ function wsUrl(){ return cfg.rpc.replace(/^http/, "ws"); }
 function wsConnect(){
   if(ws && ws.readyState <= 1) return;
   try{ ws = new WebSocket(wsUrl()); }catch{ ws = null; return; }
-  ws.onopen = () => { wsRetry = 0; if(liveMint && cur?.mint === liveMint) subscribeVenue(); };
+  ws.onopen = () => { wsRetry = 0; if(liveMint && cur?.mint === liveMint) subscribeVenue(); if(launchesWanted) subscribeLaunches(); };
   ws.onmessage = e => {
     let m; try{ m = JSON.parse(e.data); }catch{ return; }
     if(m.id != null && wsPending[m.id]){ wsPending[m.id](m.result); delete wsPending[m.id]; return; }
     if(m.method === "accountNotification"){ const h = wsSubs[m.params?.subscription]; if(h) h(m.params.result.value); }
+    if(m.method === "logsNotification" && m.params?.subscription === launchSub) onLaunchLogs(m.params.result.value);
   };
-  ws.onclose = () => { wsSubs = {}; wsPending = {}; if(liveMint) setTimeout(wsConnect, Math.min(15000, 1000 * 2 ** wsRetry++)); };
+  ws.onclose = () => { wsSubs = {}; wsPending = {}; launchSub = null; if(liveMint || launchesWanted) setTimeout(wsConnect, Math.min(15000, 1000 * 2 ** wsRetry++)); };
   ws.onerror = () => {};
 }
 function wsSend(method, params){ return new Promise(res => { const id = ++wsReq; wsPending[id] = res; try{ ws.send(JSON.stringify({jsonrpc:"2.0", id, method, params})); }catch{ delete wsPending[id]; res(null); } }); }
@@ -1281,12 +1308,136 @@ function livePriceUpdate(){
   chartTick(p);
 }
 
+// ================= ⚡ Live launches (straight from Solana) =================
+// Listens only for pump.fun coin creations (every create transaction uses pump.fun's mint-authority account),
+// so new coins show up within a second of launching without downloading every trade.
+const CREATE_DISC = [27,114,169,77,222,235,99,118], TRADE_DISC = [189,219,127,211,78,230,97,238];
+let liveCoins = [], launchesWanted = false, launchSub = null, launchRenderTimer = null, lastLaunchAt = 0;
+function mintAuthority(){ return pda([enc("mint-authority")], PUMP_ID).toBase58(); }
+class Rd{
+  constructor(u){ this.u = u; this.o = 0; this.dv = new DataView(u.buffer, u.byteOffset, u.byteLength); }
+  u8(){ return this.u[this.o++]; }
+  u32(){ const v = this.dv.getUint32(this.o, true); this.o += 4; return v; }
+  u64(){ const v = this.dv.getBigUint64(this.o, true); this.o += 8; return v; }
+  i64(){ const v = this.dv.getBigInt64(this.o, true); this.o += 8; return v; }
+  key(){ const k = readKey(this.u, this.o); this.o += 32; return k; }
+  str(){ const n = this.u32(); if(n > 400) throw new Error("bad string"); const s = new TextDecoder().decode(this.u.slice(this.o, this.o + n)); this.o += n; return s; }
+}
+const startsWith = (u, d) => d.every((b, i) => u[i] === b);
+function parseCreate(u){
+  const r = new Rd(u.slice(8));
+  const c = { name: r.str(), symbol: r.str(), uri: r.str(), mint: r.key().toBase58(), bondingCurve: r.key().toBase58(), user: r.key().toBase58(),
+    creator: r.key().toBase58(), ts: Number(r.i64()) * 1000, vT: r.u64(), vS: r.u64(), rT: r.u64(), supply: r.u64(), quoteSol: true };
+  try{ r.key(); r.u8(); r.u8(); const q = r.key(); c.quoteSol = isDefaultKey(q) || q.toBase58() === SOL_MINT; }catch{}
+  return c;
+}
+function parseTrade(u){ const r = new Rd(u.slice(8)); return { mint: r.key().toBase58(), sol: r.u64(), tokens: r.u64(), isBuy: r.u8() === 1, user: r.key().toBase58() }; }
+function onLaunchLogs(v){
+  if(!v || v.err || !Array.isArray(v.logs)) return;
+  let created = null; const trades = [];
+  for(const line of v.logs){
+    if(!line.startsWith("Program data: ")) continue;
+    let u; try{ u = b64bytes(line.slice(14)); }catch{ continue; }
+    try{
+      if(startsWith(u, CREATE_DISC)) created = parseCreate(u);
+      else if(startsWith(u, TRADE_DISC)) trades.push(parseTrade(u));
+    }catch{}
+  }
+  if(!created || !created.quoteSol || liveCoins.some(c => c.mint === created.mint)) return;
+  const dev = trades.filter(t => t.isBuy && t.mint === created.mint && (t.user === created.user || t.user === created.creator));
+  created.devSol = dev.reduce((s, t) => s + t.sol, 0n);
+  created.devTokens = dev.reduce((s, t) => s + t.tokens, 0n);
+  if(created.devSol > 0n){ created.vS += created.devSol; created.vT -= created.devTokens; created.rT -= created.devTokens; }
+  created.ts = created.ts > 0 && Math.abs(Date.now() - created.ts) < 120000 ? created.ts : Date.now();
+  created.image = null; created.fresh = true;
+  liveCoins.unshift(created); liveCoins = liveCoins.slice(0, 60);
+  if(!pairCache[created.mint]) pairCache[created.mint] = liveToRow(created);
+  lastLaunchAt = Date.now();
+  fetchCoinImage(created);
+  scheduleLaunchRender();
+}
+function scheduleLaunchRender(){
+  if(launchRenderTimer) return;
+  launchRenderTimer = setTimeout(() => {
+    launchRenderTimer = null;
+    if(feed !== "live" || view !== "market" || searching) return;
+    const liveMints = new Set(liveCoins.map(c => c.mint));
+    renderRows([...liveCoins.map(liveToRow), ...rowsShown.filter(r => !r.live && !liveMints.has(r.baseToken.address))].slice(0, 80));
+    liveCoins.forEach(c => c.fresh = false);
+  }, 250);
+}
+let imgBusy = 0, imgQueue = [];
+function fetchCoinImage(c){ imgQueue.push(c); pumpImages(); }
+function pumpImages(){
+  while(imgBusy < 3 && imgQueue.length){
+    const c = imgQueue.shift(); imgBusy++;
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 5000);
+    const url = String(c.uri || "").replace(/^ipfs:\/\//, "https://ipfs.io/ipfs/");
+    (url.startsWith("http") ? fetch(url, {signal: ctl.signal}).then(r => r.json()) : Promise.reject())
+      .then(j => { const im = String(j.image || "").replace(/^ipfs:\/\//, "https://ipfs.io/ipfs/"); if(im.startsWith("http")){ c.image = im;
+        document.querySelectorAll(`.row[data-mint="${c.mint}"] .av-wrap .av`).forEach(el => { if(el.tagName !== "IMG") el.outerHTML = `<img class="av" src="${esc(im)}" alt="" onerror="this.style.visibility='hidden'">`; }); } })
+      .catch(() => {}).finally(() => { imgBusy--; pumpImages(); });
+  }
+}
+function curvePriceSol(c){ return (Number(c.vS)/1e9) / (Number(c.vT)/1e6); }
+function liveToRow(c){
+  const priceUsd = SOL_USD ? curvePriceSol(c) * SOL_USD : 0;
+  return { live: c, chainId:"solana", dexId: c.complete ? "pumpswap" : "pumpfun", baseToken:{address:c.mint, name:c.name || "New coin", symbol:c.symbol || "?"},
+    priceUsd, marketCap: priceUsd * Number(c.supply || 1000000000000000n) / 1e6, pairCreatedAt: c.ts, info:{imageUrl: c.image}, priceChange:{}, volume:{} };
+}
+function ageShort(ts){ const s = Math.max(0, Math.round((Date.now() - ts) / 1000)); return s < 60 ? s + "s" : ago(ts); }
+function curvePct(c){ return c.complete ? 100 : Math.max(0, Math.min(100, Number(10000n - c.rT * 10000n / CURVE_START_TOKENS) / 100)); }
+function liveRow(p){
+  const c = p.live, sym = p.baseToken.symbol, mint = c.mint, r = riskCache[mint];
+  const devPct = c.supply ? Number(c.devTokens || 0n) / Number(c.supply) * 100 : 0;
+  const dev = c.devSol > 0n ? ` · dev ${devPct >= 0.1 ? devPct.toFixed(1) + "%" : fmtSol(c.devSol) + "◎"}` : " · no dev buy";
+  return `<div class="row${c.fresh ? " fresh" : ""}" data-mint="${esc(mint)}" onclick="openToken('${esc(mint)}')">
+    <div class="av-wrap">${c.image ? `<img class="av" src="${esc(c.image)}" alt="" onerror="this.style.visibility='hidden'">` : `<div class="av">${esc((sym||"?")[0])}</div>`}<span class="rdot ${r?r.level:""}"></span></div>
+    <div class="grow"><div class="nm">${esc(p.baseToken.name)}<span>${esc(sym)}</span></div>
+      <div class="meta"><span class="tag curve">NEW</span><span class="age" data-age="${c.ts}">${ageShort(c.ts)}</span>${dev}</div></div>
+    <div class="px" data-px="${esc(mint)}"><b>${usd(p.marketCap)}</b><span class="chg" style="color:var(--gold)">${curvePct(c).toFixed(0)}% curve</span></div>
+    <button class="qb" onclick="event.stopPropagation();quickBuy('${esc(mint)}', this)">⚡ ${cfg.quick}</button></div>`;
+}
+function subscribeLaunches(){
+  if(!ws || ws.readyState !== 1 || launchSub !== null || !W3()) return;
+  launchSub = -1;
+  wsSend("logsSubscribe", [{mentions:[mintAuthority()]}, {commitment:"processed"}]).then(id => { launchSub = id ?? null; });
+}
+function startLaunches(){
+  launchesWanted = true;
+  if(!W3()) return;
+  if(!ws || ws.readyState > 1) wsConnect(); else if(ws.readyState === 1) subscribeLaunches();
+}
+function stopLaunches(){
+  launchesWanted = false;
+  if(ws && ws.readyState === 1 && launchSub > 0){ try{ ws.send(JSON.stringify({jsonrpc:"2.0", id:++wsReq, method:"logsUnsubscribe", params:[launchSub]})); }catch{} }
+  launchSub = null;
+}
+// Ticking ages every second, and live market cap / curve progress for new coins every 4 seconds
+setInterval(() => { document.querySelectorAll("[data-age]").forEach(el => el.textContent = ageShort(Number(el.dataset.age))); }, 1000);
+setInterval(async () => {
+  if(document.hidden || feed !== "live" || view !== "market" || searching || !liveCoins.length || !W3()) return;
+  try{
+    const list = liveCoins.slice(0, 50), accts = await multipleAccounts(list.map(c => c.bondingCurve));
+    list.forEach((c, i) => {
+      const a = accts[i]; if(!a || a.data.length < 49) return;
+      c.vT = readU64(a.data,8); c.vS = readU64(a.data,16); c.rT = readU64(a.data,24); c.complete = a.data[48] === 1;
+      const row = liveToRow(c), el = document.querySelector(`[data-px="${c.mint}"]`);
+      if(el){ const b = el.querySelector("b"), old = b?.textContent;
+        el.innerHTML = `<b>${usd(row.marketCap)}</b><span class="chg" style="color:var(--gold)">${c.complete ? "graduated" : curvePct(c).toFixed(0) + "% curve"}</span>`;
+        if(old && old !== usd(row.marketCap)) el.querySelector("b").classList.add(row.marketCap > (Number(old.replace(/[$,KMB]/g,"")) * (/K/.test(old)?1e3:/M/.test(old)?1e6:1)) ? "flash-up" : "flash-down"); }
+      const pc = pairCache[c.mint]; if(pc?.live){ pc.priceUsd = row.priceUsd; pc.marketCap = row.marketCap; }
+    });
+  }catch{}
+}, 4000);
+
 // ================= Live market list =================
 async function refreshListPrices(){
   if(!rowsShown.length) return;
-  const mints = rowsShown.map(r => r.baseToken.address).slice(0, 60);
+  const mints = rowsShown.filter(r => !r.live).map(r => r.baseToken.address).slice(0, 60);
   const by = await pairsFor(mints);
   for(const r of rowsShown){
+    if(r.live) continue;                                   // brand-new coins are updated straight from the chain
     const n = by[r.baseToken.address]; if(!n) continue;
     const oldP = Number(r.priceUsd), newP = Number(n.priceUsd);
     r.priceUsd = n.priceUsd; r.priceChange = n.priceChange; r.marketCap = n.marketCap ?? r.marketCap; r.volume = n.volume;
