@@ -199,7 +199,7 @@ h2.page{margin:6px 0 12px;font-size:22px}
       <div class="grow"><div class="t">Bulled app</div><div class="s" id="appStatus">Put Bulled on your home screen</div></div>
       <button class="btn" id="appBtn" onclick="openInstall()">Get the app</button>
     </div>
-    <div class="note">Bulled never asks for your seed phrase or private key. Every trade is approved in your Phantom wallet.</div>
+    <div class="note">Bulled never asks for your seed phrase or private key. Every trade is approved in your own wallet.</div>
     <label>⚡ Quick buy amount (the one-tap buy button on each coin)</label>
     <select id="set-quick">
       <option value="0.01">0.01 SOL</option><option value="0.05">0.05 SOL</option><option value="0.1">0.1 SOL</option>
@@ -299,32 +299,52 @@ let SOL_USD = 0;
 
 // ================= Wallet =================
 let wallet = null, solBal = null;
-function provider(){ const p = window.phantom?.solana || window.solana; return p && p.isPhantom ? p : null; }
+const WALLETS = [
+  {id:"phantom",  name:"Phantom",  get:()=>{ const p=window.phantom?.solana||window.solana; return p?.isPhantom?p:null; },
+    install:"https://phantom.app/download", browse:u=>"https://phantom.app/ul/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},
+  {id:"solflare", name:"Solflare", get:()=>{ const p=window.solflare; return p?.isSolflare?p:null; },
+    install:"https://solflare.com/download", browse:u=>"https://solflare.com/ul/v1/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},
+  {id:"backpack", name:"Backpack", get:()=>{ const p=window.backpack; return p?.isBackpack?p:null; },
+    install:"https://backpack.app/downloads", browse:null},
+];
+function walletDef(){ return WALLETS.find(w=>w.id===ls("wallet","")) || WALLETS.find(w=>w.get()) || WALLETS[0]; }
+function provider(){ return walletDef().get(); }
 function isMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent); }
-function phantomBrowseLink(){ return "https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin); }
 function renderWallet(){
   $("walletBox").innerHTML = wallet
     ? `<div class="wallet" onclick="walletMenu()"><span class="dot"></span>${short(wallet)} <small>${solBal===null?"":solBal.toFixed(3)+" SOL"}</small></div>`
-    : `<button class="btn" onclick="connect()">Connect Phantom</button>`;
+    : `<button class="btn" onclick="connect()">Connect wallet</button>`;
 }
-async function connect(){
-  const p = provider();
-  if(!p){
-    if(isMobile()){ location.href = phantomBrowseLink(); return; }
-    openSheetHTML(`<h2 style="margin:0 0 8px">Phantom not found</h2>
-      <p style="color:var(--sub);font-size:14px;line-height:1.5">Install the Phantom browser extension, then reload this page. On your phone, open Bulled inside the Phantom app's browser.</p>
-      <a class="btn full" style="display:block;text-align:center;text-decoration:none" href="https://phantom.app/download" target="_blank" rel="noopener">Get Phantom</a>`);
-    return;
-  }
+function connect(){
+  const rows = WALLETS.map(w => {
+    const installed = !!w.get();
+    const act = installed ? `connectWith('${w.id}')`
+      : (isMobile() && w.browse) ? `location.href=WALLETS.find(x=>x.id==='${w.id}').browse(location.href)`
+      : `window.open('${w.install}','_blank','noopener')`;
+    return `<button class="btn ghost full" style="margin-top:8px;display:flex;justify-content:space-between" onclick="${act}"><span>${w.name}</span><small>${installed ? "Detected" : (isMobile() && w.browse ? "Open in app" : "Install")}</small></button>`;
+  }).join("");
+  openSheetHTML(`<h2 style="margin:0 0 6px">Connect a wallet</h2>
+    <p style="color:var(--sub);font-size:14px;line-height:1.5;margin:0 0 8px">Pick the wallet you use. On your phone, choose one to open Bulled inside that wallet's app.</p>${rows}`);
+}
+async function connectWith(id){
+  const w = WALLETS.find(x=>x.id===id), p = w?.get();
+  if(!p) return;
   try{
     const res = await p.connect();
-    wallet = res.publicKey.toString();
-    renderWallet(); refreshBalance(); toast("Wallet connected");
+    lsSet("wallet", id);
+    wallet = (res?.publicKey || p.publicKey).toString();
+    bindWallet(p);
+    closeSheet(); renderWallet(); refreshBalance(); toast(w.name + " connected");
     rerenderView();
   }catch{ toast("Connection cancelled"); }
 }
+let boundWallet = null;
+function bindWallet(p){
+  if(boundWallet === p) return; boundWallet = p;
+  p.on?.("accountChanged", k => { wallet = k ? k.toString() : null; solBal = null; renderWallet(); refreshBalance(); rerenderView(); });
+}
 function walletMenu(){
-  openSheetHTML(`<h2 style="margin:0 0 4px">Wallet</h2>
+  openSheetHTML(`<h2 style="margin:0 0 4px">${walletDef().name}</h2>
     <p style="color:var(--sub);font-size:13px;word-break:break-all">${esc(wallet)}</p>
     <div class="links"><a href="https://solscan.io/account/${esc(wallet)}" target="_blank" rel="noopener">View on Solscan ↗</a></div>
     <button class="btn ghost full" style="margin-top:16px" onclick="navigator.clipboard?.writeText(wallet).then(()=>toast('Address copied'))">Copy address</button>
@@ -577,10 +597,16 @@ async function runTrade(v, p, onStage){
   if(!W3()) throw new Error("Trading library didn't load. Reload the page.");
   const user = pk(wallet);
   if(p.side === "buy" && solBal != null && Number(p.total)/1e9 + 0.01 > solBal) throw new Error("Not enough SOL (keep ~0.01 SOL for network fees)");
-  onStage?.("Approve in Phantom…");
+  onStage?.("Approve in your wallet…");
   const before = await holdingOf(v.mint).catch(()=>null);
   const tx = await buildTrade(v, p, user);
-  const {signature} = await provider().signAndSendTransaction(tx);
+  const wp = provider();
+  let signature;
+  if(wp.signAndSendTransaction) ({signature} = await wp.signAndSendTransaction(tx));
+  else {
+    const signed = await wp.signTransaction(tx);
+    signature = await rpc("sendTransaction", [btoa(String.fromCharCode(...signed.serialize())), {encoding:"base64", skipPreflight:false, preflightCommitment:"confirmed"}]);
+  }
   onStage?.("Confirming…");
   const ok = await waitConfirm(signature);
   if(ok !== false){
@@ -903,7 +929,7 @@ function tradeParts(){
     presets: side === "buy" ? [0.05,0.1,0.25,0.5,1].map(x=>`<button onclick="setAmt(${x})">${x}</button>`).join("")
       : [25,50,75,100].map(x=>`<button onclick="setPct(${x})" ${has?"":"disabled"}>${x}%</button>`).join(""),
     placeholder: side === "buy" ? "0.1" : (has ? "0" : "You don't hold this coin"),
-    button: wallet ? `${side==="buy"?"Buy":"Sell"} ${esc(sym)}` : `Connect Phantom to ${side}`,
+    button: wallet ? `${side==="buy"?"Buy":"Sell"} ${esc(sym)}` : `Connect your wallet to ${side}`,
   };
 }
 // Draws the buy/sell box. If the same form is already showing, only the changing parts are updated,
@@ -916,7 +942,7 @@ function renderTrade(){
   if(!tradable(v)){
     box.dataset.key = "untradable";
     const why = v?.reason === "usdc" ? "This coin trades against USDC, which Bulled doesn't support yet." : "Bulled trades pump.fun coins, and this one isn't from pump.fun.";
-    box.innerHTML = `<div class="note" style="margin-top:12px">${why} You can still trade it in your Phantom wallet's Swap tab.</div>`;
+    box.innerHTML = `<div class="note" style="margin-top:12px">${why} You can still trade it in your wallet's Swap tab.</div>`;
     return;
   }
   const t = tradeParts(), key = `${v.kind}|${side}`;
@@ -989,7 +1015,7 @@ async function doTrade(){
 }
 function tradeError(e){
   const m = String(e?.message || e);
-  if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in Phantom");
+  if(/reject|cancel|denied/i.test(m)) toast("Trade cancelled in wallet");
   else toast(m.length > 110 ? "Trade didn't go through. Try again." : m, 4000);
 }
 function showResult(sig, ok){
@@ -1010,7 +1036,7 @@ async function quickBuy(mint, btn){
     if(r?.level === "bad" && !confirm("RugCheck flags this coin as HIGH RISK. You could lose everything. Buy anyway?")) return;
     const p = planTrade(v, "buy", BigInt(Math.round(cfg.quick * 1e9)));
     if(!p) throw new Error("Couldn't price this coin");
-    toast(`⚡ Buying ${cfg.quick} SOL of ${pairCache[mint]?.baseToken?.symbol || "coin"}… approve in Phantom`);
+    toast(`⚡ Buying ${cfg.quick} SOL of ${pairCache[mint]?.baseToken?.symbol || "coin"}… approve in your wallet`);
     const {ok} = await runTrade(v, p);
     toast(ok===true ? "✅ Bought!" : ok===false ? "Price moved too fast. Nothing was swapped." : "📤 Trade sent", 3500);
   }catch(e){ tradeError(e); }
@@ -1020,7 +1046,7 @@ async function quickBuy(mint, btn){
 // ================= Holdings with P&L =================
 async function renderHoldings(){
   const el = $("holdings");
-  if(!wallet){ el.innerHTML = `<h2 class="page">Holdings</h2><div class="empty">Connect Phantom to see your coins and profit.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect Phantom</button></div>`; return; }
+  if(!wallet){ el.innerHTML = `<h2 class="page">Holdings</h2><div class="empty">Connect your wallet to see your coins and profit.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect wallet</button></div>`; return; }
   if(!el.innerHTML.includes("hero")) el.innerHTML = `<h2 class="page">Holdings</h2><div class="empty">Loading your wallet…</div>`;
   try{
     await refreshBalance();
@@ -1058,7 +1084,7 @@ function renderEarn(){
     ${link ? `<div class="section">Your link</div><div class="linkbox"><span class="grow">${esc(link)}</span></div>
       <div style="display:flex;gap:8px"><button class="btn full" onclick="shareLink()">Share link</button><button class="btn ghost" style="padding:15px 16px" onclick="copyRef()">Copy</button></div>
       <div class="links"><a href="https://solscan.io/account/${esc(wallet)}#transfers" target="_blank" rel="noopener">See your earnings on Solscan ↗</a></div>`
-      : `<div class="empty">Connect Phantom to get your referral link.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect Phantom</button></div>`}
+      : `<div class="empty">Connect your wallet to get your referral link.<br><button class="btn" style="margin-top:14px" onclick="connect()">Connect wallet</button></div>`}
     <div class="section">How it works</div>
     <div class="inst-step"><div class="n">1</div><div>Share your link on X, Telegram or with friends</div></div>
     <div class="inst-step"><div class="n">2</div><div>They trade on Bulled. Their fee stays the same 0.45%</div></div>
@@ -1106,7 +1132,7 @@ async function openInstall(){
     if(r.outcome === "accepted") return;
     body = `<p style="font-size:14.5px;line-height:1.5">No problem. Tap <b>Get the app</b> in Settings any time.</p>`;
   } else if(inWalletBrowser()){
-    body = `<p style="font-size:14px;color:var(--sub);line-height:1.5">You're inside the Phantom app, which can't add apps to your home screen. It takes 3 quick steps:</p>
+    body = `<p style="font-size:14px;color:var(--sub);line-height:1.5">You're inside your wallet's app, which can't add apps to your home screen. It takes 3 quick steps:</p>
       ${step(1, `Copy the Bulled link<br><button class="btn ghost" style="margin-top:8px" onclick="copyLink()">Copy link</button>`)}
       ${step(2, `Open <b>${isIOS() ? "Safari" : "Chrome"}</b> and paste the link`)}
       ${step(3, `Tap <b>Get the app</b> on Bulled there and follow the steps`)}`;
@@ -1123,7 +1149,7 @@ async function openInstall(){
            step(2, `Click it, then click <b>Install</b>`) +
            `<p class="fine">On your phone, open ${esc(siteLink())} and tap <b>Get the app</b>.</p>`;
   }
-  openSheetHTML(head + body + `<div class="note" style="margin-top:14px">To trade from the app, tap <b>Connect Phantom</b>. Bulled opens in Phantom so you can approve trades with your wallet.</div>`);
+  openSheetHTML(head + body + `<div class="note" style="margin-top:14px">To trade from the app, tap <b>Connect wallet</b>. Bulled opens in your wallet app so you can approve trades with your wallet.</div>`);
 }
 function copyLink(){ navigator.clipboard?.writeText(siteLink()).then(()=>toast("Link copied. Now open " + (isIOS() ? "Safari" : "Chrome")), ()=>toast(siteLink(), 6000)); }
 
@@ -1475,8 +1501,7 @@ if("serviceWorker" in navigator && location.protocol === "https:") navigator.ser
 setTimeout(async () => {
   const p = provider();
   if(p){
-    try{ const r = await p.connect({onlyIfTrusted:true}); wallet = r.publicKey.toString(); renderWallet(); refreshBalance(); rerenderView(); }catch{}
-    p.on?.("accountChanged", k => { wallet = k ? k.toString() : null; solBal = null; renderWallet(); refreshBalance(); rerenderView(); });
+    try{ const r = await p.connect({onlyIfTrusted:true}); wallet = (r?.publicKey || p.publicKey).toString(); bindWallet(p); renderWallet(); refreshBalance(); rerenderView(); }catch{}
   }
 }, 300);
 </script>
