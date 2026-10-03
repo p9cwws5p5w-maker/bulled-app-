@@ -18,6 +18,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.98.0/lib/index.iife.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.0/dist/lightweight-charts.standalone.production.js"></script>
+<script src="config.js"></script>
 <style>
 :root{
   color-scheme:dark;
@@ -238,7 +239,7 @@ h2.page{margin:6px 0 12px;font-size:22px}
 const FEE_WALLET = "H2XUGjettEcEnRd7DVLCr9PMHJqXzP4PvjHd6qeuqbA5";  // your 0.45% goes here
 const BULLED_FEE_BPS = 45;        // 0.45% on every buy and sell
 const REF_SHARE_BPS = 3000;       // referrers get 30% of Bulled's fee (paid out of your 0.45%, traders pay the same)
-const DEFAULT_RPC = "https://mainnet.helius-rpc.com/?api-key=52f6a349-9632-473b-b3b9-66228fc1115b";
+const DEFAULT_RPC = window.BULLED_RPC || "https://api.mainnet-beta.solana.com";  // set your RPC in config.js
 
 // ================= Constants =================
 const SOL_MINT = "So11111111111111111111111111111111111111112";
@@ -307,7 +308,7 @@ const WALLETS = [
   {id:"backpack", name:"Backpack", get:()=>{ const p=window.backpack; return p?.isBackpack?p:null; },
     install:"https://backpack.app/downloads", browse:null},
 ];
-function walletDef(){ return WALLETS.find(w=>w.id===ls("wallet","")) || WALLETS.find(w=>w.get()) || WALLETS[0]; }
+function walletDef(){ return WALLETS.find(w=>w.id===ls("wallet","") && w.get()) || WALLETS.find(w=>w.get()) || WALLETS[0]; }
 function provider(){ return walletDef().get(); }
 function isMobile(){ return /iphone|ipad|ipod|android/i.test(navigator.userAgent); }
 function renderWallet(){
@@ -602,7 +603,8 @@ async function runTrade(v, p, onStage){
   const tx = await buildTrade(v, p, user);
   const wp = provider();
   let signature;
-  if(wp.signAndSendTransaction) ({signature} = await wp.signAndSendTransaction(tx));
+  if(!wp) throw new Error("Wallet not found. Reconnect your wallet and try again.");
+  if(wp.signAndSendTransaction){ const r = await wp.signAndSendTransaction(tx); signature = typeof r === "string" ? r : r?.signature; }
   else {
     const signed = await wp.signTransaction(tx);
     signature = await rpc("sendTransaction", [btoa(String.fromCharCode(...signed.serialize())), {encoding:"base64", skipPreflight:false, preflightCommitment:"confirmed"}]);
