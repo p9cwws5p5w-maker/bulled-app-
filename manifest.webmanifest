@@ -1,7 +1,7 @@
 {
   "name": "Bulled",
   "short_name": "Bulled",
-  "description": "Trade pump.fun coins with rug warnings built in.",
+  "description": "Learn, practise and trade Solana memecoins with rug warnings built in.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
