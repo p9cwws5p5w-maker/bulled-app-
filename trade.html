@@ -191,6 +191,7 @@ h2.page{margin:6px 0 12px;font-size:22px}
   </div>
 
   <div id="view-holdings" class="hide"><div id="holdings"></div></div>
+  <div id="view-following" class="hide"><div id="following"></div></div>
   <div id="view-earn" class="hide"><div id="earn"></div></div>
 
   <div id="view-settings" class="hide">
@@ -224,6 +225,7 @@ h2.page{margin:6px 0 12px;font-size:22px}
 
 <nav class="nav">
   <button class="on" data-view="market"><span class="i">📈</span>Market</button>
+  <button data-view="following"><span class="i">👥</span>Following</button>
   <button data-view="holdings"><span class="i">💼</span>Holdings</button>
   <button data-view="earn"><span class="i">🎁</span>Earn</button>
   <button data-view="settings"><span class="i">⚙️</span>Settings</button>
@@ -1160,13 +1162,13 @@ let view = "market";
 function show(v){
   view = v;
   if(v !== "market") stopLaunches(); else if(feed === "live") startLaunches();
-  ["market","holdings","earn","settings"].forEach(x => $("view-"+x).classList.toggle("hide", x!==v));
+  ["market","following","holdings","earn","settings"].forEach(x => $("view-"+x).classList.toggle("hide", x!==v));
   document.querySelectorAll(".nav button").forEach(b => b.classList.toggle("on", b.dataset.view===v));
   rerenderView();
   if(v==="settings"){ $("set-rpc").value = ls("rpc",""); $("set-slip").value = String(cfg.slip); $("set-prio").value = String(cfg.prio); $("set-quick").value = String(cfg.quick); }
   window.scrollTo(0,0);
 }
-function rerenderView(){ if(view==="holdings") renderHoldings(); if(view==="earn") renderEarn(); if(view==="market" && rowsShown.length) renderRows(rowsShown); }
+function rerenderView(){ if(view==="following") renderFollowing(); if(view==="holdings") renderHoldings(); if(view==="earn") renderEarn(); if(view==="market" && rowsShown.length) renderRows(rowsShown); }
 document.querySelectorAll(".nav button").forEach(b => b.onclick = () => show(b.dataset.view));
 function saveSettings(){
   lsSet("rpc", $("set-rpc").value.trim()); lsSet("slip", $("set-slip").value); lsSet("prio", $("set-prio").value); lsSet("quick", $("set-quick").value);
@@ -1501,7 +1503,7 @@ loadSolPrice();
 loadList();
 // Deep links from the main Bulled app: trade.html?coin=<mint> or ?view=holdings
 (function deepLink(){ try{ const q = new URLSearchParams(location.search), c = q.get("coin"), v = q.get("view");
-  if(["holdings","earn","settings"].includes(v)) show(v);
+  if(["following","holdings","earn","settings"].includes(v)) show(v);
   if(c && isMint(c)) openToken(c); }catch{} })();
 if("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(()=>{});
 setTimeout(async () => {
@@ -1511,5 +1513,6 @@ setTimeout(async () => {
   }
 }, 300);
 </script>
+<script src="follow.js"></script>
 </body>
 </html>
